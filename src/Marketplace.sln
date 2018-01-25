@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace", "Marketplace\Marketplace.csproj", "{5CDD7B63-9D54-4286-9EC0-D5375885BE71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Framework", "Marketplace.Framework\Marketplace.Framework.csproj", "{EEEDFB39-58D4-4782-AE8F-2C438652A13E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Framework.Tests", "..\tests\Marketplace.Framework.Tests\Marketplace.Framework.Tests.csproj", "{243546CA-6AD5-4486-8B74-5227F8CB106F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5CDD7B63-9D54-4286-9EC0-D5375885BE71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CDD7B63-9D54-4286-9EC0-D5375885BE71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CDD7B63-9D54-4286-9EC0-D5375885BE71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CDD7B63-9D54-4286-9EC0-D5375885BE71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEEDFB39-58D4-4782-AE8F-2C438652A13E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEEDFB39-58D4-4782-AE8F-2C438652A13E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEEDFB39-58D4-4782-AE8F-2C438652A13E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEEDFB39-58D4-4782-AE8F-2C438652A13E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{243546CA-6AD5-4486-8B74-5227F8CB106F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{243546CA-6AD5-4486-8B74-5227F8CB106F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{243546CA-6AD5-4486-8B74-5227F8CB106F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{243546CA-6AD5-4486-8B74-5227F8CB106F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
