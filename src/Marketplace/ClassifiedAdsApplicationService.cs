@@ -5,7 +5,7 @@ using Marketplace.Framework;
 
 namespace Marketplace
 {
-    public static class CommandModule
+    public static class ClassifiedAdsApplicationService
     {
         public static Task Handle(ClassifiedAds.V1.CreateClassifiedAd command, IAggregateStore store) =>
             store.Save(ClassifiedAd.Create(
