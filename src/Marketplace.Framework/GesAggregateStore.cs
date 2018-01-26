@@ -95,7 +95,7 @@ namespace Marketplace.Framework
                 return default;
             }
 
-            var stream = _getStreamName(typeof(T), aggregate.Id);
+            var stream = _getStreamName(typeof(T), aggregate.Id.ToString());
 
             WriteResult result;
             try

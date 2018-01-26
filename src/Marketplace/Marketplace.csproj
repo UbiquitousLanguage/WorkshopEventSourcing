@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Application" />
-    <Folder Include="Infrastructure\Services" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Marketplace.Framework\Marketplace.Framework.csproj" />
+    <ProjectReference Include="..\Marketplace.Domain\Marketplace.Domain.csproj" />
+    <ProjectReference Include="..\Marketplace.Framework\Marketplace.Framework.csproj">
+      <Project>{EEEDFB39-58D4-4782-AE8F-2C438652A13E}</Project>
+      <Name>Marketplace.Framework</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

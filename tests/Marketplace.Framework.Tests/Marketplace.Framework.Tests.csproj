@@ -18,6 +18,11 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Marketplace.Domain\Marketplace.Domain.csproj">
+      <Project>{9AB26E16-316F-4140-9342-937D3D61A073}</Project>
+      <Name>Marketplace.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Marketplace.Framework\Marketplace.Framework.csproj" />
     <ProjectReference Include="..\..\src\Marketplace.Framework\Marketplace.Framework.csproj" />
     <ProjectReference Include="..\..\src\Marketplace\Marketplace.csproj">
       <Project>{5CDD7B63-9D54-4286-9EC0-D5375885BE71}</Project>

@@ -4,8 +4,8 @@ namespace Marketplace.Domain.ClassifiedAds
 {
     public class Picture : Value<Picture>
     {
-        public readonly string Description;
-        public readonly string Url;
+        public string Description { get; }
+        public string Url { get; }
 
         public Picture(string url, string description)
         {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Marketplace.Framework
@@ -7,7 +8,7 @@ namespace Marketplace.Framework
     {
         private readonly IList<object> _changes = new List<object>();
 
-        public string Id { get; protected set; } = string.Empty;
+        public Guid Id { get; protected set; } = Guid.Empty;
         public long Version { get; private set; } = -1;
 
         protected abstract void When(object e);
