@@ -27,23 +27,15 @@ namespace Marketplace.Framework
             });
         }
 
-        public override int GetHashCode()
-        {
-            return CombineHashCodes(
+        public override int GetHashCode() =>
+            CombineHashCodes(
                 Members.Select(m => m.IsNonStringEnumerable
                     ? CombineHashCodes(GetEnumerableValues(m.GetValue(this)))
                     : m.GetValue(this)));
-        }
 
-        public static bool operator ==(Value<T> left, Value<T> right)
-        {
-            return Equals(left, right);
-        }
+        public static bool operator ==(Value<T> left, Value<T> right) => Equals(left, right);
 
-        public static bool operator !=(Value<T> left, Value<T> right)
-        {
-            return !Equals(left, right);
-        }
+        public static bool operator !=(Value<T> left, Value<T> right) => !Equals(left, right);
 
         public override string ToString()
         {

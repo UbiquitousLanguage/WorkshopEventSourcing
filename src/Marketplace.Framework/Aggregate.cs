@@ -18,7 +18,7 @@ namespace Marketplace.Framework
             _changes.Add(e);
         }
 
-        public void LoadFromHistory(params object[] history)
+        public void Load(object[] history)
         {
             foreach (var e in history)
             {
@@ -27,9 +27,6 @@ namespace Marketplace.Framework
             }
         }
 
-        public object[] GetChanges()
-        {
-            return _changes.ToArray();
-        }
+        public object[] GetChanges() => _changes.ToArray();
     }
 }

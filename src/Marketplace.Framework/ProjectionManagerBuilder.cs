@@ -57,9 +57,8 @@ namespace Marketplace.Framework
             return this;
         }
 
-        public ProjectionManager Build()
-        {
-            return new ProjectionManager(
+        public ProjectionManager Build() =>
+            new ProjectionManager(
                 _connection,
                 _checkpointStore,
                 _serializer,
@@ -68,7 +67,6 @@ namespace Marketplace.Framework
                 _maxLiveQueueSize,
                 _readBatchSize
             );
-        }
 
         public async Task<ProjectionManager> Activate()
         {

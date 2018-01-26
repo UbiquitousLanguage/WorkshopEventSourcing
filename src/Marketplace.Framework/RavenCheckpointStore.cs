@@ -56,10 +56,8 @@ namespace Marketplace.Framework
             }
         }
 
-        private static string GetCheckpointDocumentId(string projection)
-        {
-            return $"checkpoints/{projection.ToLowerInvariant()}";
-        }
+        private static string GetCheckpointDocumentId(string projection) => 
+            $"checkpoints/{projection.ToLowerInvariant()}";
 
         private class CheckpointDocument
         {

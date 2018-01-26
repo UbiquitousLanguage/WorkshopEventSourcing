@@ -14,14 +14,8 @@ namespace Marketplace.Framework
 
         public abstract Task Handle(object e);
 
-        public override string ToString()
-        {
-            return _type.Name;
-        }
+        public override string ToString() => _type.Name;
 
-        public static implicit operator string(Projection self)
-        {
-            return self.ToString();
-        }
+        public static implicit operator string(Projection self) => self.ToString();
     }
 }

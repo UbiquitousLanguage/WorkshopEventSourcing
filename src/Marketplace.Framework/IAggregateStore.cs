@@ -14,7 +14,7 @@ namespace Marketplace.Framework
         ///     Saves changes to the store.
         /// </summary>
         Task<(long NextExpectedVersion, long LogPosition, long CommitPosition )> Save<T>(
-            T aggregate, Metadata metadata = null, CancellationToken cancellationToken = default) where T : Aggregate;
+            T aggregate, CancellationToken cancellationToken = default) where T : Aggregate;
 
         /// <summary>
         ///     Returns the last version of the aggregate if found.
