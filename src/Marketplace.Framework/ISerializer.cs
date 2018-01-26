@@ -1,7 +1,7 @@
-﻿namespace Marketplace.Framework
-{
-    using System;
+﻿using System;
 
+namespace Marketplace.Framework
+{
     public interface ISerializer
     {
         bool IsJsonSerializer { get; }

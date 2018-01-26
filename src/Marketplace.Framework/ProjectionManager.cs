@@ -1,49 +1,54 @@
-﻿namespace Marketplace.Framework
-{
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using global::EventStore.ClientAPI;
-    using Marketplace.Framework.Logging;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using EventStore.ClientAPI;
+using Marketplace.Framework.Logging;
 
+namespace Marketplace.Framework
+{
     public class ProjectionManager
     {
         public static readonly ProjectionManagerBuilder With = new ProjectionManagerBuilder();
 
         private static readonly ILog Log = LogProvider.For<ProjectionManager>();
+        private readonly ICheckpointStore _checkpointStore;
 
         private readonly IEventStoreConnection _connection;
-        private readonly ICheckpointStore      _checkpointStore;
-        private readonly ISerializer           _serializer;
-        private readonly TypeMapper            _typeMapper;
-        private readonly int                   _maxLiveQueueSize;
-        private readonly int                   _readBatchSize;
-        private readonly Projection[]          _projections;
-            
+        private readonly int _maxLiveQueueSize;
+        private readonly Projection[] _projections;
+        private readonly int _readBatchSize;
+        private readonly ISerializer _serializer;
+        private readonly TypeMapper _typeMapper;
+
         internal ProjectionManager(
             IEventStoreConnection connection, ICheckpointStore checkpointStore, ISerializer serializer,
-            TypeMapper typeMapper, Projection[] projections, int? maxLiveQueueSize, int? readBatchSize) {
-            _connection       = connection       ?? throw new ArgumentNullException(nameof(connection));
-            _checkpointStore  = checkpointStore  ?? throw new ArgumentNullException(nameof(checkpointStore));
-            _serializer       = serializer       ?? throw new ArgumentNullException(nameof(serializer));
-            _typeMapper       = typeMapper       ?? throw new ArgumentNullException(nameof(typeMapper));
-            _projections      = projections      ?? throw new ArgumentNullException(nameof(projections));
+            TypeMapper typeMapper, Projection[] projections, int? maxLiveQueueSize, int? readBatchSize)
+        {
+            _connection = connection ?? throw new ArgumentNullException(nameof(connection));
+            _checkpointStore = checkpointStore ?? throw new ArgumentNullException(nameof(checkpointStore));
+            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+            _typeMapper = typeMapper ?? throw new ArgumentNullException(nameof(typeMapper));
+            _projections = projections ?? throw new ArgumentNullException(nameof(projections));
             _maxLiveQueueSize = maxLiveQueueSize ?? 10000;
-            _readBatchSize    = readBatchSize    ?? 500;
+            _readBatchSize = readBatchSize ?? 500;
         }
 
-        public Task Activate() => Task.WhenAll(_projections.Select(StartProjection));
+        public Task Activate()
+        {
+            return Task.WhenAll(_projections.Select(StartProjection));
+        }
 
-        private async Task StartProjection(Projection projection) {
+        private async Task StartProjection(Projection projection)
+        {
             var lastCheckpoint = await _checkpointStore.GetLastCheckpoint<Position>(projection);
 
             var settings = new CatchUpSubscriptionSettings(
-                maxLiveQueueSize: _maxLiveQueueSize,
-                readBatchSize   : _readBatchSize,
-                verboseLogging  : Log.IsTraceEnabled(), 
-                resolveLinkTos  : false, 
-                subscriptionName: projection);
-            
+                _maxLiveQueueSize,
+                _readBatchSize,
+                Log.IsTraceEnabled(),
+                false,
+                projection);
+
             _connection.SubscribeToAllFrom(
                 lastCheckpoint,
                 settings,
@@ -53,31 +58,39 @@
         }
 
         private Action<EventStoreCatchUpSubscription, ResolvedEvent> EventAppeared(Projection projection)
-            => async (_, e) => {
+        {
+            return async (_, e) =>
+            {
                 // always double check if it is a system event ;)
-                if (e.OriginalEvent.EventType.StartsWith("$")) return; 
-                
+                if (e.OriginalEvent.EventType.StartsWith("$")) return;
+
                 // get the configured clr type name for deserializing the event
                 var eventType = _typeMapper.GetType(e.Event.EventType);
-    
+
                 // try to execute the projection
                 await projection.Handle(_serializer.Deserialize(e.Event.Data, eventType));
-    
-                Log.Trace("{projection} projected {eventType}({eventId})", projection, e.Event.EventType, e.Event.EventId);
+
+                Log.Trace("{projection} projected {eventType}({eventId})", projection, e.Event.EventType,
+                    e.Event.EventId);
 
                 // store the current checkpoint
                 await _checkpointStore.SetCheckpoint(e.OriginalPosition, projection);
             };
+        }
 
-        private Action<EventStoreCatchUpSubscription, SubscriptionDropReason, Exception> SubscriptionDropped(Projection projection) 
-            => (subscription, reason, ex) => {
+        private Action<EventStoreCatchUpSubscription, SubscriptionDropReason, Exception> SubscriptionDropped(
+            Projection projection)
+        {
+            return (subscription, reason, ex) =>
+            {
                 // TODO: Reevaluate stopping subscriptions when issues with reconnect get fixed.
                 // https://github.com/EventStore/EventStore/issues/1127
                 // https://groups.google.com/d/msg/event-store/AdKzv8TxabM/VR7UDIRxCgAJ
-    
+
                 subscription.Stop();
-    
-                switch (reason) {
+
+                switch (reason)
+                {
                     case SubscriptionDropReason.UserInitiated:
                         Log.Debug("{projection} projection stopped gracefully.", projection);
                         break;
@@ -101,48 +114,56 @@
                         break;
                 }
             };
+        }
 
         private static Action<EventStoreCatchUpSubscription> LiveProcessingStarted(Projection projection)
-            => _ => Log.Debug("{projection} projection has caught up, now processing live!", projection);
+        {
+            return _ => Log.Debug("{projection} projection has caught up, now processing live!", projection);
+        }
     }
-    
+
     public class FunctionalProjectionManager
     {
         private static readonly ILog Log = LogProvider.For<ProjectionManager>();
+        private readonly ICheckpointStore _checkpointStore;
 
-        private readonly IEventStoreConnection                      _connection;
-        private readonly ICheckpointStore                           _checkpointStore;
-        private readonly ISerializer                                _serializer;
-        private readonly TypeMapper                                 _typeMapper;
-        private readonly int                                        _maxLiveQueueSize;
-        private readonly int                                        _readBatchSize;
+        private readonly IEventStoreConnection _connection;
+        private readonly int _maxLiveQueueSize;
         private readonly (string Name, Func<object, Task> Handle)[] _projections;
-            
+        private readonly int _readBatchSize;
+        private readonly ISerializer _serializer;
+        private readonly TypeMapper _typeMapper;
+
         internal FunctionalProjectionManager(
             IEventStoreConnection connection, ICheckpointStore checkpointStore, ISerializer serializer,
-            TypeMapper typeMapper, (string Name, Func<object, Task>)[] projections, 
-            int? maxLiveQueueSize, int? readBatchSize) {
-            _connection       = connection       ?? throw new ArgumentNullException(nameof(connection));
-            _checkpointStore  = checkpointStore  ?? throw new ArgumentNullException(nameof(checkpointStore));
-            _serializer       = serializer       ?? throw new ArgumentNullException(nameof(serializer));
-            _typeMapper       = typeMapper       ?? throw new ArgumentNullException(nameof(typeMapper));
-            _projections      = projections      ?? throw new ArgumentNullException(nameof(projections));
+            TypeMapper typeMapper, (string Name, Func<object, Task>)[] projections,
+            int? maxLiveQueueSize, int? readBatchSize)
+        {
+            _connection = connection ?? throw new ArgumentNullException(nameof(connection));
+            _checkpointStore = checkpointStore ?? throw new ArgumentNullException(nameof(checkpointStore));
+            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+            _typeMapper = typeMapper ?? throw new ArgumentNullException(nameof(typeMapper));
+            _projections = projections ?? throw new ArgumentNullException(nameof(projections));
             _maxLiveQueueSize = maxLiveQueueSize ?? 10000;
-            _readBatchSize    = readBatchSize    ?? 500;
+            _readBatchSize = readBatchSize ?? 500;
         }
 
-        public Task Activate() => Task.WhenAll(_projections.Select(StartProjection));
+        public Task Activate()
+        {
+            return Task.WhenAll(_projections.Select(StartProjection));
+        }
 
-        private async Task StartProjection((string Name, Func<object, Task>) projection) {
+        private async Task StartProjection((string Name, Func<object, Task>) projection)
+        {
             var lastCheckpoint = await _checkpointStore.GetLastCheckpoint<Position>(projection.Name);
 
             var settings = new CatchUpSubscriptionSettings(
-                maxLiveQueueSize: _maxLiveQueueSize,
-                readBatchSize   : _readBatchSize,
-                verboseLogging  : Log.IsTraceEnabled(), 
-                resolveLinkTos  : false, 
-                subscriptionName: projection.Name);
-            
+                _maxLiveQueueSize,
+                _readBatchSize,
+                Log.IsTraceEnabled(),
+                false,
+                projection.Name);
+
             _connection.SubscribeToAllFrom(
                 lastCheckpoint,
                 settings,
@@ -151,32 +172,41 @@
                 SubscriptionDropped(projection));
         }
 
-        private Action<EventStoreCatchUpSubscription, ResolvedEvent> EventAppeared((string Name, Func<object, Task> Handle) projection)
-            => async (_, e) => {
+        private Action<EventStoreCatchUpSubscription, ResolvedEvent> EventAppeared(
+            (string Name, Func<object, Task> Handle) projection)
+        {
+            return async (_, e) =>
+            {
                 // always double check if it is a system event ;)
-                if (e.OriginalEvent.EventType.StartsWith("$")) return; 
-                
+                if (e.OriginalEvent.EventType.StartsWith("$")) return;
+
                 // get the configured clr type name for deserializing the event
                 var eventType = _typeMapper.GetType(e.Event.EventType);
-    
+
                 // try to execute the projection
                 await projection.Handle(_serializer.Deserialize(e.Event.Data, eventType));
-    
-                Log.Trace("{projection} projected {eventType}({eventId})", projection.Name, e.Event.EventType, e.Event.EventId);
+
+                Log.Trace("{projection} projected {eventType}({eventId})", projection.Name, e.Event.EventType,
+                    e.Event.EventId);
 
                 // store the current checkpoint
                 await _checkpointStore.SetCheckpoint(e.OriginalPosition, projection.Name);
             };
+        }
 
-        private Action<EventStoreCatchUpSubscription, SubscriptionDropReason, Exception> SubscriptionDropped((string Name, Func<object, Task> Handle) projection) 
-            => (subscription, reason, ex) => {
+        private Action<EventStoreCatchUpSubscription, SubscriptionDropReason, Exception> SubscriptionDropped(
+            (string Name, Func<object, Task> Handle) projection)
+        {
+            return (subscription, reason, ex) =>
+            {
                 // TODO: Reevaluate stopping subscriptions when issues with reconnect get fixed.
                 // https://github.com/EventStore/EventStore/issues/1127
                 // https://groups.google.com/d/msg/event-store/AdKzv8TxabM/VR7UDIRxCgAJ
-    
+
                 subscription.Stop();
-    
-                switch (reason) {
+
+                switch (reason)
+                {
                     case SubscriptionDropReason.UserInitiated:
                         Log.Debug("{projection} projection stopped gracefully.", projection.Name);
                         break;
@@ -200,8 +230,12 @@
                         break;
                 }
             };
+        }
 
-        private static Action<EventStoreCatchUpSubscription> LiveProcessingStarted((string Name, Func<object, Task> Handle) projection)
-            => _ => Log.Debug("{projection} projection has caught up, now processing live!", projection.Name);
+        private static Action<EventStoreCatchUpSubscription> LiveProcessingStarted(
+            (string Name, Func<object, Task> Handle) projection)
+        {
+            return _ => Log.Debug("{projection} projection has caught up, now processing live!", projection.Name);
+        }
     }
 }

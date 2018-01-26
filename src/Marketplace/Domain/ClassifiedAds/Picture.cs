@@ -1,7 +1,7 @@
-﻿namespace Marketplace.Domain.ClassifiedAds
-{
-    using Marketplace.Framework;
+﻿using Marketplace.Framework;
 
+namespace Marketplace.Domain.ClassifiedAds
+{
     public class Picture : Value<Picture>
     {
         public readonly string Description;
@@ -9,7 +9,7 @@
 
         public Picture(string url, string description)
         {
-            Url         = url;
+            Url = url;
             Description = description;
         }
     }

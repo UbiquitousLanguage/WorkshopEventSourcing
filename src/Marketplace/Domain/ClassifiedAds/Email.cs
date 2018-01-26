@@ -4,10 +4,19 @@
     {
         public readonly string Value;
 
-        public Email(string value) => Value = value;
-        
-        public static implicit operator string(Email self) => self.Value;
+        public Email(string value)
+        {
+            Value = value;
+        }
 
-        public static implicit operator Email(string value) => new Email(value);
+        public static implicit operator string(Email self)
+        {
+            return self.Value;
+        }
+
+        public static implicit operator Email(string value)
+        {
+            return new Email(value);
+        }
     }
 }

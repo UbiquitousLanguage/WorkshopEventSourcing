@@ -1,8 +1,8 @@
-﻿namespace Marketplace.Framework
-{
-    using System.Threading;
-    using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
+namespace Marketplace.Framework
+{
     public interface IAggregateStore
     {
         /// <summary>
