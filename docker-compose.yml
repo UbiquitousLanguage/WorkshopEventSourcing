@@ -8,25 +8,10 @@ services:
         environment:
             - EVENTSTORE_EXT_HTTP_PORT=2113
             - EVENTSTORE_EXT_TCP_PORT=1113
-#        volumes:
-#            - eventstore-data:/var/lib/eventstore
     ravendb:
         image: "ravendb/ravendb"
         ports:
             - "8080:8080"
-#        volumes:
-#            - ravendb-data:/opt/RavenDB/Server/RavenData
         environment:
             - RAVEN_Security_UnsecuredAccessAllowed=PrivateNetwork
             - RAVEN_ARGS="--Setup.Mode=None"
-    neo4j:
-        image: "neo4j"
-        ports:
-            - "7474:7474"
-#        volumes:
-#            - neo4j-data:/data/dbms
-#volumes:
-#    ravendb-data:
-#    eventstore-data:
-#    neo4j-data:
-    
