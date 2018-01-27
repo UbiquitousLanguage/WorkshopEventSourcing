@@ -30,6 +30,28 @@ $ docker-compose up
 
 form your terminal command line, whilst being inside the repository rot directory.
 
+It might be a good idea to run the services in detached mode, so you don't accidentally stop them. To do this, execute:
+
+```
+$ docker-compose up -d
+```
+
+To stop all services, from the repository root execute this command:
+
+```
+$ docker-compose stop
+```
+
+Hence that this command does not remove containers so you can run them again using `docker-compose up` or `docker-compose start` and your data will be retained from the previous section.
+
+If you want to clean up all data, use
+
+```
+$ docker-compose down
+```
+
+This command stops all services and removes containers. The images will still be present locally so when you do `docker-compose up` - containers will be created almost instantly and everything will start with clean volumes.
+
 ### Installing components manually
 
 If you are unable or do not with to use Docker Compose, you can download EventStore and RavenDb and the install these products locally. EventStore has no "installation" as such on Windows, you just need to extract the archive and start the executable.
@@ -61,5 +83,5 @@ Start with trying to get up the Docker Compose images. Do this before the worksh
 
 Start Docker Compose as described above while at home and check that the images are downloaded and everything starts properly. Check if EventStore and RavenDb respond via http by visiting the administration consoles:
 
-- [EventStore](http://localhost:2113), user name and password are "changeit"
+- [EventStore](http://localhost:2113), user name is "admin" and password is "changeit"
 - [RavenDb](http://localhost:8080)
