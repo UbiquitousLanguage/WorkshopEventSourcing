@@ -1,6 +1,8 @@
 # Marketplace
 
-Write something here.
+This is the lab repository for the Practical Event-Sourcing with C# hands-on session. The workshop is taught by [Alexey](https://twitter.com/Zimareff) and [Sergio](https://twitter.com/ragingkore). Feel free to ping us if you have questions after the session or feedback to improve it.
+
+Due to the time limitation, there are many aspects of event-sourcing, which we will not be able to cover. Some reference materials will be included in this file later on, so start the repo to be informed.
 
 ## Prerequisites
 
@@ -10,7 +12,7 @@ Write something here.
 
 The solution is using C# 7.1 features so if you are using Visual Studio - ensure you have VS 2017. Rider supports the latest C# by default or will ask you if you want to enable it.
 
-Note that Docker Compose is _not_ included to Docker, so you need to [download and install](https://docs.docker.com/compose/install/) it. [Docker](https://docs.docker.com/install/) is a pre-requisite for Docker Compose.
+Note that Docker Compose might _not_ included to your version of Docker, so you need to [download and install](https://docs.docker.com/compose/install/) it. [Docker](https://docs.docker.com/install/) is a pre-requisite for Docker Compose.
 
 > In case you are unable to use Docker Compose, please download the following products:
 >- [EventStore](https://eventstore.org/downloads/)
