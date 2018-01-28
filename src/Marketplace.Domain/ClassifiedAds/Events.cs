@@ -41,7 +41,7 @@ namespace Marketplace.Domain.ClassifiedAds
             public class PictureAddedToClassifiedAd
             {
                 public Guid Id { get; set; }
-                public Messages.Shared.V1.Picture Picture { get; set; }
+                public Picture Picture { get; set; }
                 public DateTimeOffset PictureAddedAt { get; set; }
                 public Guid PictureAddedBy { get; set; }
             }
@@ -49,7 +49,7 @@ namespace Marketplace.Domain.ClassifiedAds
             public class PictureRemovedFromClassifiedAd
             {
                 public Guid Id { get; set; }
-                public Messages.Shared.V1.Picture Picture { get; set; }
+                public Picture Picture { get; set; }
                 public DateTimeOffset PictureRemovedAt { get; set; }
                 public Guid PictureRemovedBy { get; set; }
             }
