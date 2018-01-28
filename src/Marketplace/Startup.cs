@@ -1,4 +1,5 @@
-﻿using Marketplace.Domain.ClassifiedAds;
+﻿using System;
+using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,7 +15,10 @@ namespace Marketplace
         {
             services.AddMvc();
             services.AddSwaggerGen(c =>
-                c.SwaggerDoc("v1", new Info {Title = "Event Log API", Version = "v1"}));
+            {
+                c.SwaggerDoc("v1", new Info {Title = "Event Log API", Version = "v1"});
+                c.IncludeXmlComments($"{AppDomain.CurrentDomain.BaseDirectory}/Marketplace.xml");
+            });
             services.AddSingleton<IAggregateStore>(new GesAggregateStore(
                 (type, id) => $"{type.Name}-{id}",
                 Defaults.GetConnection().Result,
@@ -35,7 +39,10 @@ namespace Marketplace
             app.UseMvcWithDefaultRoute();
 
             app.UseSwagger();
-            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Event Log API V1"); });
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Event Log API V1"); 
+            });
         }
 
         private static TypeMapper ConfigureMapper()
