@@ -81,7 +81,7 @@ namespace Marketplace.Framework
                 throw new ArgumentNullException(nameof(aggregate));
 
             var changes = aggregate.GetChanges()
-                .Select((e, idx) => new EventData(
+                .Select(e => new EventData(
                     Guid.NewGuid(),
                     _typeMapper.GetTypeName(e.GetType()),
                     _serializer.IsJsonSerializer,
