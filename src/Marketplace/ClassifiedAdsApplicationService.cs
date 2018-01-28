@@ -13,5 +13,14 @@ namespace Marketplace
                 command.OwnerId,
                 command.CreatedBy,
                 command.CreatedAt));
+        
+        public static async Task Handle(ClassifiedAds.V1.RenameClassifiedAd command, IAggregateStore store)
+        {
+            var ad = await store.Load<ClassifiedAd>(command.Id.ToString());
+
+            ad.Rename(command.Title, command.RenamedAt, command.RenamedBy);
+
+            await store.Save(ad);
+        }
     }
 }

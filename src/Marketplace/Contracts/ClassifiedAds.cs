@@ -33,6 +33,32 @@ namespace Marketplace.Contracts
 
                 public override string ToString() => $"Creating Classified Ad {Id}";
             }
+
+            public class RenameClassifiedAd
+            {
+                /// <summary>
+                ///     New ad id
+                /// </summary>
+                public Guid Id { get; set; }
+
+                /// <summary>
+                ///     The new title
+                /// </summary>
+                public string Title { get; set; }
+                
+                /// <summary>
+                ///     Rename date
+                /// </summary>
+                public DateTime RenamedAt { get; set; }
+                
+                /// <summary>
+                ///     Id of the user who renamed the ad
+                /// </summary>
+                public Guid RenamedBy { get; set; }
+                
+                public override string ToString() 
+                    => $"Renaming Classified Ad {Id} to '{(Title?.Length > 25 ? $"{Title.Substring(0, 22)}..." : Title )}'";
+            }
         }
     }
 }

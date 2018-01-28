@@ -40,7 +40,11 @@ namespace Marketplace.Domain.ClassifiedAds
             return ad;
         }
 
-        public void Rename(Title title, DateTimeOffset renamedAt, UserId renamedBy) =>
+        public void Rename(Title title, DateTimeOffset renamedAt, UserId renamedBy)
+        {
+            if (Version == -1)
+                throw new Exceptions.ClassifiedAdNotFoundException();       
+            
             Apply(new Events.V1.ClassifiedAdRenamed
             {
                 Id = Id,
@@ -48,6 +52,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 RenamedAt = renamedAt,
                 RenamedBy = renamedBy
             });
+        }
 
         public void UpdateText(AdText text, DateTimeOffset updatedAt, UserId updatedBy) =>
             Apply(new Events.V1.ClassifiedAdTextUpdated

@@ -1,4 +1,4 @@
-﻿namespace Marketplace.Domain.Messages
+﻿namespace Marketplace.Domain.Events
 {
     public static class Shared
     {

@@ -7,10 +7,7 @@ namespace Marketplace.Framework
     {
         private readonly Type _type;
 
-        protected Projection()
-        {
-            _type = GetType();
-        }
+        protected Projection() => _type = GetType();
 
         public abstract Task Handle(object e);
 
