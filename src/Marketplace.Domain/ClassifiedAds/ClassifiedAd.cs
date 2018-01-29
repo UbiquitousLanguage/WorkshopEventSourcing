@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Marketplace.Framework;
 
 namespace Marketplace.Domain.ClassifiedAds
@@ -72,12 +71,20 @@ namespace Marketplace.Domain.ClassifiedAds
                 PriceChangedBy = changedBy
             });
 
-        public void Publish(UserId publishedBy, DateTimeOffset publishedAt) =>
+        public void Publish(DateTimeOffset publishedAt, UserId publishedBy) =>
             Apply(new Events.V1.ClassifiedAdPublished
             {
                 Id = Id,
                 PublishedBy = publishedBy,
                 PublishedAt = publishedAt
+            });
+
+        public void Activate(DateTimeOffset activatedAt, UserId activatedBy) =>
+            Apply(new Events.V1.ClassifiedAdActivated
+            {
+                Id = Id,
+                ActivatedBy = activatedBy,
+                ActivatedAt = activatedAt
             });
 
         public void Reject(string reason, UserId rejectedBy, DateTimeOffset rejectedAt) =>

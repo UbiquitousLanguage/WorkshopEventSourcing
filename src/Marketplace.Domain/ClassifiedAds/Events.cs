@@ -10,6 +10,7 @@ namespace Marketplace.Domain.ClassifiedAds
             {
                 public Guid Id { get; set; }
                 public Guid Owner { get; set; }
+                public string Title { get; set; }
                 public DateTimeOffset CreatedAt { get; set; }
                 public Guid CreatedBy { get; set; }
             }
@@ -67,6 +68,13 @@ namespace Marketplace.Domain.ClassifiedAds
                 public string Reason { get; set; }
                 public DateTimeOffset RejectedAt { get; set; }
                 public Guid RejectedBy { get; set; }
+            }
+
+            public class ClassifiedAdActivated
+            {
+                public Guid Id { get; set; }
+                public Guid ActivatedBy { get; set; }
+                public DateTimeOffset ActivatedAt { get; set; }
             }
             
             public class ClassifiedAdReportedByUser

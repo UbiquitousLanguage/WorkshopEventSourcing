@@ -19,7 +19,7 @@ namespace Marketplace
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var esConnection = Defaults.GetConnection().GetAwaiter().GetResult();
+            var esConnection = Defaults.GetConnection().Result;
             var typeMapper = ConfigureTypeMapper();
 
             services.AddMvc();
@@ -43,19 +43,17 @@ namespace Marketplace
                 .Serializer(new JsonNetSerializer())
                 .TypeMapper(typeMapper)
                 .Projections(
-                    new MyClassifiedAdsProjection(openSession)
+                    new MyClassifiedAdsProjection(openSession),
+                    new ActiveAdsProjection(openSession)
                 )
-                .Activate().GetAwaiter().GetResult();
+                .Activate().Wait();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
-            }
 
             app.UseMvcWithDefaultRoute();
 

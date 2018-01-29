@@ -8,19 +8,19 @@ using Marketplace.Domain.ClassifiedAds;
 
 namespace Marketplace.Tests
 {
-    public class Rename_classified_ad : Specification<ClassifiedAd, ClassifiedAds.V1.RenameClassifiedAd>
+    public class Rename_classified_ad : Specification<ClassifiedAd, ClassifiedAds.V1.RenameAd>
     {
         public readonly Fixture AutoFixture = new Fixture();
 
-        public override Func<ClassifiedAds.V1.RenameClassifiedAd, Task> GetHandler(SpecificationAggregateStore store)
-            => cmd => ClassifiedAdsApplicationService.Handle(cmd, store);
+        public override Func<ClassifiedAds.V1.RenameAd, Task> GetHandler(SpecificationAggregateStore store)
+            => cmd => new ClassifiedAdsApplicationService(store).Handle(cmd);
 
         public override object[] Given() 
             => AutoFixture.CreateMany<Events.V1.ClassifiedAdCreated>(1)
                           .ToArray();
 
-        public override ClassifiedAds.V1.RenameClassifiedAd When()
-            => AutoFixture.Build<ClassifiedAds.V1.RenameClassifiedAd>()
+        public override ClassifiedAds.V1.RenameAd When()
+            => AutoFixture.Build<ClassifiedAds.V1.RenameAd>()
                           .With(cmd => cmd.Id, ((Events.V1.ClassifiedAdCreated) History[0]).Id)
                           .Create();
 
