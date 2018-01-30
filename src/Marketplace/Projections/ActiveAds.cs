@@ -25,23 +25,39 @@ namespace Marketplace.Projections
                 switch (e)
                 {
                     case Events.V1.ClassifiedAdActivated x:
-                        doc = new ActiveAd { Id = DocumentId(x.Id) };
+                        doc = new ActiveAd
+                        {
+                            Id = DocumentId(x.Id),
+                            Title = x.Title,
+                            Price = x.Price
+                        };
                         await session.StoreAsync(doc);
+                        break;
+
+                    case Events.V1.ClassifiedAdRenamed x:
+                        await session.UpdateOrThrow<ActiveAd>(DocumentId(x.Id), r => r.Title = x.Title);
+                        break;
+
+                    case Events.V1.ClassifiedAdPriceChanged x:
+                        await session.UpdateOrThrow<ActiveAd>(DocumentId(x.Id), r => r.Price = x.Price);
                         break;
 
                     case Events.V1.ClassifiedAdDeactivated x:
                         session.Delete(DocumentId(x.Id));
                         break;
                 }
-                await session.SaveChangesAsync();
+                await session.SaveChangesAsync() ;
             }
         }
 
         private static string DocumentId(Guid id) => $"PublishedAd/{id}";
+
     }
 
     public class ActiveAd
     {
         public string Id { get; set; }
+        public string Title { get; set; }
+        public double Price { get; set; }
     }
 }

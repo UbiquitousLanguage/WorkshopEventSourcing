@@ -58,6 +58,8 @@ namespace Marketplace.Domain.ClassifiedAds
             public class ClassifiedAdPublished
             {
                 public Guid Id { get; set; }
+                public string Title { get; set; }
+                public string Text { get; set; }
                 public DateTimeOffset PublishedAt { get; set; }
                 public Guid PublishedBy { get; set; }
             }
@@ -73,6 +75,8 @@ namespace Marketplace.Domain.ClassifiedAds
             public class ClassifiedAdActivated
             {
                 public Guid Id { get; set; }
+                public string Title { get; set; }
+                public double Price { get; set; }
                 public Guid ActivatedBy { get; set; }
                 public DateTimeOffset ActivatedAt { get; set; }
             }

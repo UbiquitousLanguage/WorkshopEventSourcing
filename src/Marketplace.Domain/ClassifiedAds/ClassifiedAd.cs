@@ -7,6 +7,9 @@ namespace Marketplace.Domain.ClassifiedAds
     {
         private bool _isPublished;
         private bool _sold;
+        private Title _title;
+        private AdText _text;
+        private Price _price;
 
         protected override void When(object e)
         {
@@ -14,6 +17,19 @@ namespace Marketplace.Domain.ClassifiedAds
             {
                 case Events.V1.ClassifiedAdCreated x:
                     Id = x.Id;
+                    _title = x.Title;
+                    break;
+
+                case Events.V1.ClassifiedAdRenamed x:
+                    _title = x.Title;
+                    break;
+
+                case Events.V1.ClassifiedAdTextUpdated x:
+                    _text = x.AdText;
+                    break;
+
+                case Events.V1.ClassifiedAdPriceChanged x:
+                    _price = x.Price;
                     break;
 
                 case Events.V1.ClassifiedAdPublished x:
@@ -76,13 +92,17 @@ namespace Marketplace.Domain.ClassifiedAds
             {
                 Id = Id,
                 PublishedBy = publishedBy,
-                PublishedAt = publishedAt
+                PublishedAt = publishedAt,
+                Title = _title,
+                Text = _text
             });
 
         public void Activate(DateTimeOffset activatedAt, UserId activatedBy) =>
             Apply(new Events.V1.ClassifiedAdActivated
             {
                 Id = Id,
+                Title = _title,
+                Price = _price,
                 ActivatedBy = activatedBy,
                 ActivatedAt = activatedAt
             });

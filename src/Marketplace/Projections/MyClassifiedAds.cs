@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
-using Microsoft.AspNetCore.Diagnostics;
 using Raven.Client.Documents.Session;
 
 namespace Marketplace.Projections
@@ -40,7 +39,8 @@ namespace Marketplace.Projections
                         doc.ListOfAds.Add(new MyClassifiedAds.MyClassifiedAd
                         {
                             Id = x.Id,
-                            Status = "New"
+                            Status = "New",
+                            Title = x.Title
                         });
                         break;
                 }
