@@ -14,14 +14,21 @@ using Swashbuckle.AspNetCore.Swagger;
 
 namespace Marketplace
 {
+    using System.Threading.Tasks;
+
     public class Startup
     {
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            var esConnection = Defaults.GetConnection().Result;
-            var typeMapper = ConfigureTypeMapper();
+        //public void ConfigureServices(IServiceCollection services)
 
+        public void ConfigureServices(IServiceCollection services) => ConfigureServicesAsync(services).GetAwaiter().GetResult();
+
+        private async Task ConfigureServicesAsync(IServiceCollection services)
+        {
+            var esConnection = await Defaults.GetConnection();
+            var typeMapper = ConfigureTypeMapper();
+            var serializer = new JsonNetSerializer();
+            
             services.AddMvc();
             services.AddSwaggerGen(c =>
             {
@@ -31,22 +38,22 @@ namespace Marketplace
             services.AddSingleton<IAggregateStore>(new GesAggregateStore(
                 (type, id) => $"{type.Name}-{id}",
                 esConnection,
-                new JsonNetSerializer(),
+                serializer,
                 typeMapper
             ));
 
-            var openSession = ConfgiureRavenDb();
+            var getSession = ConfigureRavenDb();
 
-            ProjectionManagerBuilder.With
+            await ProjectionManagerBuilder.With
                 .Connection(esConnection)
-                .CheckpointStore(new RavenCheckpointStore(openSession))
-                .Serializer(new JsonNetSerializer())
+                .CheckpointStore(new RavenCheckpointStore(getSession))
+                .Serializer(serializer)
                 .TypeMapper(typeMapper)
                 .Projections(
-                    new MyClassifiedAdsProjection(openSession),
-                    new ActiveAdsProjection(openSession)
+                    new ClassifiedAdsByOwner(getSession),
+                    new ActiveClassifiedAds(getSession)
                 )
-                .Activate().Wait();
+                .Activate();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,6 +71,7 @@ namespace Marketplace
         private static TypeMapper ConfigureTypeMapper()
         {
             var mapper = new TypeMapper();
+            
             mapper.Map<Events.V1.ClassifiedAdCreated>("ClassifiedAdCreated");
             mapper.Map<Events.V1.ClassifiedAdRenamed>("ClassifiedAdRenamed");
             mapper.Map<Events.V1.ClassifiedAdPublished>("ClassifiedAdPublished");
@@ -72,19 +80,19 @@ namespace Marketplace
             return mapper;
         }
 
-        private static Func<IAsyncDocumentSession> ConfgiureRavenDb()
+        private static Func<IAsyncDocumentSession> ConfigureRavenDb()
         {
-            const string dbName = "ClassifiedAds";
+            const string databaseName = "ClassifiedAds";
 
             var store = new DocumentStore
             {
                 Urls = new[] {"http://localhost:8080"},
-                Database = dbName
+                Database = databaseName
             }.Initialize();
             
             var databaseNames = store.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 25));
-            if (!databaseNames.Contains(dbName))
-                store.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(dbName)));
+            if (!databaseNames.Contains(databaseName))
+                store.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(databaseName)));
             
             return () => store.OpenAsyncSession();
         }

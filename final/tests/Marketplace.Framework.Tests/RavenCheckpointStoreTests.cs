@@ -30,7 +30,7 @@ namespace Marketplace.Framework.Tests
             var store = new DocumentStore
             {
                 Urls = new[] {"http://localhost:8080"},
-                Database = "Default"
+                Database = "ClassifiedAds"
             };
 
             return store.Initialize();

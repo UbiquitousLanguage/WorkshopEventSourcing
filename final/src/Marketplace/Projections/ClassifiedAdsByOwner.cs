@@ -7,41 +7,42 @@ using Raven.Client.Documents.Session;
 
 namespace Marketplace.Projections
 {
-    public class MyClassifiedAdsProjection : Projection
+    public class ClassifiedAdsByOwner : Projection
     {
-        private readonly Func<IAsyncDocumentSession> _openSession;
+        private readonly Func<IAsyncDocumentSession> _getSession;
         
-        public MyClassifiedAdsProjection(Func<IAsyncDocumentSession> openSession)
+        public ClassifiedAdsByOwner(Func<IAsyncDocumentSession> getSession)
         {
-            _openSession = openSession;
+            _getSession = getSession;
         }
         
         public override async Task Handle(object e)
         {
-            using (var session = _openSession())
+            using (var session = _getSession())
             {
                 switch (e)
                 {
                     case Events.V1.ClassifiedAdCreated x:
                         var id = DocumentId(x.Id);
 
-                        var doc = await session.LoadAsync<MyClassifiedAds>(id);
-                        
+                        var doc = await session.LoadAsync<ClassifiedAdsByOwnerDocument>(id);                    
                         if (doc == null)
                         {
-                            doc = new MyClassifiedAds
+                            doc = new ClassifiedAdsByOwnerDocument
                             {
                                 Id = id,
-                                ListOfAds = new List<MyClassifiedAds.MyClassifiedAd>()
+                                ListOfAds = new List<ClassifiedAdsByOwnerDocument.MyClassifiedAd>()
                             };
                             await session.StoreAsync(doc);
                         }
-                        doc.ListOfAds.Add(new MyClassifiedAds.MyClassifiedAd
+                        
+                        doc.ListOfAds.Add(new ClassifiedAdsByOwnerDocument.MyClassifiedAd
                         {
                             Id = x.Id,
                             Status = "New",
                             Title = x.Title
                         });
+                        
                         break;
                 }
 
@@ -49,10 +50,10 @@ namespace Marketplace.Projections
             }
         }
 
-        private static string DocumentId(Guid id) => $"MyClassifiedAds/{id}";
+        private static string DocumentId(Guid id) => $"ClassifiedAdsByOwner/{id}";
     }
 
-    public class MyClassifiedAds
+    public class ClassifiedAdsByOwnerDocument
     {
         public string Id { get; set; }
         public List<MyClassifiedAd> ListOfAds { get; set; }

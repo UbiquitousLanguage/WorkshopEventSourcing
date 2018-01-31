@@ -8,18 +8,18 @@ using Raven.Client.Documents.Session;
 
 namespace Marketplace.Projections
 {
-    public class AdsAwaitingActivationProjection : Projection
+    public class ClassifiedAdsPendingActivation : Projection
     {
-        private readonly Func<IAsyncDocumentSession> _openSession;
+        private readonly Func<IAsyncDocumentSession> _getSession;
 
-        public AdsAwaitingActivationProjection(Func<IAsyncDocumentSession> openSession)
+        public ClassifiedAdsPendingActivation(Func<IAsyncDocumentSession> getSession)
         {
-            _openSession = openSession;
+            _getSession = getSession;
         }
 
         public override async Task Handle(object e)
         {
-            using (var session = _openSession())
+            using (var session = _getSession())
             {
                 switch (e)
                 {

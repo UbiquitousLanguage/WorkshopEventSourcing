@@ -21,7 +21,9 @@ namespace Marketplace.Tests
             Command = When();
 
             var sut = new TAggregate();
+                      
             sut.Load(History);
+            
             var store = SpecificationAggregateStore.For(sut);
 
             try

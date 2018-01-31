@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Marketplace.Projections;
 using Raven.Client.Documents.Session;
 
-namespace Marketplace.Projections
+namespace Marketplace.Framework
 {
-    public static class SessionExtentions
+    public static class RavenDocumentSessionExtensions
     {
         public static async Task UpdateOrThrow<T>(this IAsyncDocumentSession session, string id, Action<T> update)
         {
