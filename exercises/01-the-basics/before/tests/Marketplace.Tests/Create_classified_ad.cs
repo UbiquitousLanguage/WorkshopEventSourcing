@@ -23,7 +23,12 @@ namespace Marketplace.Tests
         [Then]
         public void Classified_ad_is_created()
         {
-            // put the test here
+            RaisedEvents.ShouldBeEquivalentTo(new [] { new Events.V1.ClassifiedAdCreated {
+                Id        = Command.Id,
+                Owner     = Command.OwnerId,
+                CreatedBy = Command.CreatedBy,
+                CreatedAt = Command.CreatedAt
+            }});
         }
     }
 }
