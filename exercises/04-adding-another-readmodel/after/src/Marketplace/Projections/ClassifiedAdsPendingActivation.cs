@@ -3,28 +3,30 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics;
 using Raven.Client.Documents.Session;
 
 namespace Marketplace.Projections
 {
-    public class AdsAwaitingActivationProjection : Projection
+    public class ClassifiedAdsPendingActivation : Projection
     {
-        private readonly Func<IAsyncDocumentSession> _openSession;
+        private readonly Func<IAsyncDocumentSession> _getSession;
 
-        public AdsAwaitingActivationProjection(Func<IAsyncDocumentSession> openSession)
+        public ClassifiedAdsPendingActivation(Func<IAsyncDocumentSession> getSession)
         {
-            _openSession = openSession;
+            _getSession = getSession;
         }
 
         public override async Task Handle(object e)
         {
-            using (var session = _openSession())
+            using (var session = _getSession())
             {
+                AdAwaitingActivation doc;
                 switch (e)
                 {
                     case Events.V1.ClassifiedAdPublished x:
-                        var doc = new AdAwaitingActivation
+                        doc = new AdAwaitingActivation
                         {
                             Id = DocumentId(x.Id),
                             Title = x.Title,
@@ -34,11 +36,13 @@ namespace Marketplace.Projections
                         break;
 
                     case Events.V1.ClassifiedAdRenamed x:
-                        await session.UpdateOrThrow<AdAwaitingActivation>(DocumentId(x.Id), r => r.Title = x.Title);
+                        doc = await session.LoadAsync<AdAwaitingActivation>(DocumentId(x.Id));
+                        doc.Title = x.Title;
                         break;
 
                     case Events.V1.ClassifiedAdTextUpdated x:
-                        await session.UpdateOrThrow<AdAwaitingActivation>(DocumentId(x.Id), r => r.Text = x.AdText);
+                        doc = await session.LoadAsync<AdAwaitingActivation>(DocumentId(x.Id));
+                        doc.Text = x.AdText;
                         break;
 
                     case Events.V1.ClassifiedAdActivated x:
@@ -49,7 +53,7 @@ namespace Marketplace.Projections
                         session.Delete(DocumentId(x.Id));
                         break;
                 }
-                await session.SaveChangesAsync() ;
+                await session.SaveChangesAsync();
             }
         }
 

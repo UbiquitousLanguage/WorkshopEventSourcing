@@ -13,14 +13,20 @@ namespace Marketplace.Domain.ClassifiedAds
                 public string Title { get; set; }
                 public DateTimeOffset CreatedAt { get; set; }
                 public Guid CreatedBy { get; set; }
+
+                public override string ToString()
+                    => $"Classified Ad {Id} was created.";
             }
 
             public class ClassifiedAdRenamed
             {
                 public Guid Id { get; set; }
-                public Title Title { get; set; }
+                public string Title { get; set; }
                 public DateTimeOffset RenamedAt { get; set; }
                 public Guid RenamedBy { get; set; }
+
+                public override string ToString() =>
+                    $"Classified Ad {Id} was renamed to '{(Title?.Length > 25 ? $"{Title?.Substring(0, 22)}..." : Title)}'";
             }
             
             public class ClassifiedAdTextUpdated

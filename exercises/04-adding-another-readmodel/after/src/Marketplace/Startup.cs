@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
 using Marketplace.Projections;
@@ -17,9 +19,12 @@ namespace Marketplace
     public class Startup
     {
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services) =>
+            ConfigureServicesAsync(services).GetAwaiter().GetResult();
+
+        private async Task ConfigureServicesAsync(IServiceCollection services)
         {
-            var esConnection = Defaults.GetConnection().Result;
+            var esConnection = await Defaults.GetConnection();
             var typeMapper = ConfigureTypeMapper();
 
             services.AddMvc();
@@ -37,16 +42,17 @@ namespace Marketplace
 
             var openSession = ConfgiureRavenDb();
 
-            ProjectionManagerBuilder.With
+            await ProjectionManagerBuilder.With
                 .Connection(esConnection)
                 .CheckpointStore(new RavenCheckpointStore(openSession))
                 .Serializer(new JsonNetSerializer())
                 .TypeMapper(typeMapper)
                 .Projections(
-                    new ActiveAdsProjection(openSession),
-                    new AdsAwaitingActivationProjection(openSession)
+                    new ActiveClassifiedAds(openSession),
+                    new ClassifiedAdsPendingActivation(openSession),
+                    new ClassifiedAdsByOwner(openSession)
                 )
-                .Activate().Wait();
+                .Activate();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

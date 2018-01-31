@@ -8,24 +8,21 @@ using Raven.Client.Documents.Session;
 
 namespace Marketplace.Projections
 {
-    public class ActiveAdsProjection : Projection
+    public class ActiveClassifiedAds : Projection
     {
         private readonly Func<IAsyncDocumentSession> _openSession;
 
-        public ActiveAdsProjection(Func<IAsyncDocumentSession> openSession)
-        {
-            _openSession = openSession;
-        }
+        public ActiveClassifiedAds(Func<IAsyncDocumentSession> getSession) => _openSession = getSession;
 
         public override async Task Handle(object e)
         {
-            ActiveAd doc;
+            ActiveClassifiedAdDocument doc;
             using (var session = _openSession())
             {
                 switch (e)
                 {
                     case Events.V1.ClassifiedAdActivated x:
-                        doc = new ActiveAd
+                        doc = new ActiveClassifiedAdDocument
                         {
                             Id = DocumentId(x.Id),
                             Title = x.Title,
@@ -35,18 +32,16 @@ namespace Marketplace.Projections
                         break;
 
                     case Events.V1.ClassifiedAdRenamed x:
-                        await session.UpdateOrThrow<ActiveAd>(DocumentId(x.Id), r => r.Title = x.Title);
+                        doc = await session.LoadAsync<ActiveClassifiedAdDocument>(DocumentId(x.Id));
+                        doc.Title = x.Title;
                         break;
 
                     case Events.V1.ClassifiedAdPriceChanged x:
-                        await session.UpdateOrThrow<ActiveAd>(DocumentId(x.Id), r => r.Price = x.Price);
+                        doc = await session.LoadAsync<ActiveClassifiedAdDocument>(DocumentId(x.Id));
+                        doc.Price = x.Price;
                         break;
 
                     case Events.V1.ClassifiedAdDeactivated x:
-                        session.Delete(DocumentId(x.Id));
-                        break;
-
-                    case Events.V1.ClassifiedAdRemoved x:
                         session.Delete(DocumentId(x.Id));
                         break;
                 }
@@ -54,11 +49,11 @@ namespace Marketplace.Projections
             }
         }
 
-        private static string DocumentId(Guid id) => $"PublishedAd/{id}";
+        private static string DocumentId(Guid id) => $"ActiveClassifiedAds/{id}";
 
     }
 
-    public class ActiveAd
+    public class ActiveClassifiedAdDocument
     {
         public string Id { get; set; }
         public string Title { get; set; }

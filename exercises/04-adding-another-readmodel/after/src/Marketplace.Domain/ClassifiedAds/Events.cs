@@ -13,16 +13,22 @@ namespace Marketplace.Domain.ClassifiedAds
                 public string Title { get; set; }
                 public DateTimeOffset CreatedAt { get; set; }
                 public Guid CreatedBy { get; set; }
+
+                public override string ToString()
+                    => $"Classified Ad {Id} was created.";
             }
 
             public class ClassifiedAdRenamed
             {
                 public Guid Id { get; set; }
-                public Title Title { get; set; }
+                public string Title { get; set; }
                 public DateTimeOffset RenamedAt { get; set; }
                 public Guid RenamedBy { get; set; }
+
+                public override string ToString() =>
+                    $"Classified Ad {Id} was renamed to '{(Title?.Length > 25 ? $"{Title?.Substring(0, 22)}..." : Title)}'";
             }
-            
+
             public class ClassifiedAdTextUpdated
             {
                 public Guid Id { get; set; }
@@ -38,7 +44,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 public DateTimeOffset PriceChangedAt { get; set; }
                 public Guid PriceChangedBy { get; set; }
             }
-            
+
             public class PictureAddedToClassifiedAd
             {
                 public Guid Id { get; set; }
@@ -46,7 +52,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 public DateTimeOffset PictureAddedAt { get; set; }
                 public Guid PictureAddedBy { get; set; }
             }
-            
+
             public class PictureRemovedFromClassifiedAd
             {
                 public Guid Id { get; set; }
@@ -63,7 +69,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 public DateTimeOffset PublishedAt { get; set; }
                 public Guid PublishedBy { get; set; }
             }
-            
+
             public class ClassifiedAdRejected
             {
                 public Guid Id { get; set; }
@@ -80,7 +86,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 public Guid ActivatedBy { get; set; }
                 public DateTimeOffset ActivatedAt { get; set; }
             }
-            
+
             public class ClassifiedAdReportedByUser
             {
                 public Guid Id { get; set; }
@@ -95,7 +101,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 public DateTimeOffset DeactivatedAt { get; set; }
                 public Guid DeactivatedBy { get; set; }
             }
-            
+
             public class ClassifiedAdMarkedAsSold
             {
                 public Guid Id { get; set; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
 using Microsoft.AspNetCore.Builder;
@@ -16,9 +17,12 @@ namespace Marketplace
     public class Startup
     {
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services) =>
+            ConfigureServicesAsync(services).GetAwaiter().GetResult();
+
+        private async Task ConfigureServicesAsync(IServiceCollection services)
         {
-            var esConnection = Defaults.GetConnection().Result;
+            var esConnection = await Defaults.GetConnection();
             var typeMapper = ConfigureTypeMapper();
 
             services.AddMvc();
@@ -36,7 +40,7 @@ namespace Marketplace
 
             var openSession = ConfgiureRavenDb();
 
-            // initialize projection manager
+            // TODO: initialize projection manager
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
