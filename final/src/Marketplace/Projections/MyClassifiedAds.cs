@@ -63,5 +63,12 @@ namespace Marketplace.Projections
             public string Title { get; set; }
             public string Status { get; set; }
         }
+        
+        public enum ClassifiedAdStatus
+        {
+            Active,
+            Inactive,
+            Sold
+        }
     }
 }

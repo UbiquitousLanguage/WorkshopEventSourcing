@@ -13,7 +13,6 @@ namespace Marketplace.Projections
                 throw new ReadModelNotFoundException(typeof(T).Name, id);
 
             update(doc);
-            await session.SaveChangesAsync();
         }
     }
 }

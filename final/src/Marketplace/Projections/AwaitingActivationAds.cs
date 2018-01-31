@@ -49,7 +49,7 @@ namespace Marketplace.Projections
                         session.Delete(DocumentId(x.Id));
                         break;
                 }
-                await session.SaveChangesAsync() ;
+                await session.SaveChangesAsync();
             }
         }
 

@@ -33,8 +33,7 @@ namespace Marketplace.Framework
             _readBatchSize = readBatchSize ?? 500;
         }
 
-        public Task Activate() =>
-            Task.WhenAll(_projections.Select(StartProjection));
+        public Task Activate() => Task.WhenAll(_projections.Select(StartProjection));
 
         private async Task StartProjection(Projection projection)
         {
@@ -55,8 +54,8 @@ namespace Marketplace.Framework
                 SubscriptionDropped(projection));
         }
 
-        private Action<EventStoreCatchUpSubscription, ResolvedEvent> EventAppeared(Projection projection) =>
-            async (_, e) =>
+        private Action<EventStoreCatchUpSubscription, ResolvedEvent> EventAppeared(Projection projection) 
+            => async (_, e) =>
             {
                 // always double check if it is a system event ;)
                 if (e.OriginalEvent.EventType.StartsWith("$")) return;
@@ -67,16 +66,14 @@ namespace Marketplace.Framework
                 // try to execute the projection
                 await projection.Handle(_serializer.Deserialize(e.Event.Data, eventType));
 
-                Log.Trace("{projection} projected {eventType}({eventId})", projection, e.Event.EventType,
-                    e.Event.EventId);
+                Log.Trace("{projection} projected {eventType}({eventId})", projection, e.Event.EventType, e.Event.EventId);
 
                 // store the current checkpoint
                 await _checkpointStore.SetCheckpoint(e.OriginalPosition, projection);
             };
 
-        private Action<EventStoreCatchUpSubscription, SubscriptionDropReason, Exception>
-            SubscriptionDropped(Projection projection) =>
-            (subscription, reason, ex) =>
+        private Action<EventStoreCatchUpSubscription, SubscriptionDropReason, Exception>SubscriptionDropped(Projection projection) 
+            => (subscription, reason, ex) =>
             {
                 // TODO: Reevaluate stopping subscriptions when issues with reconnect get fixed.
                 // https://github.com/EventStore/EventStore/issues/1127
@@ -110,8 +107,8 @@ namespace Marketplace.Framework
                 }
             };
 
-        private static Action<EventStoreCatchUpSubscription> LiveProcessingStarted(Projection projection) => 
-            _ => Log.Debug("{projection} projection has caught up, now processing live!", projection);
+        private static Action<EventStoreCatchUpSubscription> LiveProcessingStarted(Projection projection) 
+            => _ => Log.Debug("{projection} projection has caught up, now processing live!", projection);
     }
 
 }

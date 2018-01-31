@@ -13,5 +13,5 @@ services:
         ports:
             - "8080:8080"
         environment:
-            - RAVEN_Security_UnsecuredAccessAllowed=PrivateNetwork
+            - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork
             - RAVEN_ARGS="--Setup.Mode=None"
