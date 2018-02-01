@@ -1,24 +1,34 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 using Marketplace.Framework;
+using Xunit.Abstractions;
 
 namespace Marketplace.Tests
 {
-    public abstract class Specification<TAggregate, TCommand> where TAggregate  : Aggregate, new()
+    public abstract class Specification<TAggregate, TCommand> 
+          where TAggregate  : Aggregate, new() 
     {
-        public Specification()
+        private readonly ITestOutputHelper _output;
+
+        public Specification(ITestOutputHelper output)
         {
+            _output = output;
+            
             History = Given();
+            
             Command = When();
 
             var sut = new TAggregate();
+                      
             sut.Load(History);
+            
             var store = SpecificationAggregateStore.For(sut);
 
             try
             {
-                GetHandler(store)(Command).Wait();
+                GetHandler(store)(Command).GetAwaiter().GetResult();
             }
             catch (Exception exception)
             {
@@ -26,12 +36,14 @@ namespace Marketplace.Tests
             }
 
             RaisedEvents = store.RaisedEvents;
+            
+            Print();
         }
 
+        private object[] History { get; set; } 
+        
         public TCommand Command { get; }
-
-        public object[] History { get; }
-
+  
         public object[] RaisedEvents { get; }
 
         public Exception CaughtException { get; }
@@ -65,6 +77,30 @@ namespace Marketplace.Tests
 
                 return Task.FromResult<(long NextExpectedVersion, long LogPosition, long CommitPosition)>(
                     (nextVersion, nextVersion, nextVersion));
+            }
+        }
+
+        private void Print()
+        {
+            _output.WriteLine("Scenario: " + GetType().Name.Replace("_"," "));
+            _output.WriteLine("");
+
+            if (History.Length > 0)
+            {
+                _output.WriteLine("Given");
+                foreach (var entry in History)
+                {
+                    _output.WriteLine($"    {entry}"); 
+                } 
+            }
+            
+            _output.WriteLine("When");
+            _output.WriteLine($"    {Command}");
+          
+            _output.WriteLine("Then");
+            foreach (var e in RaisedEvents)
+            {
+                _output.WriteLine($"    {e}");
             }
         }
     }

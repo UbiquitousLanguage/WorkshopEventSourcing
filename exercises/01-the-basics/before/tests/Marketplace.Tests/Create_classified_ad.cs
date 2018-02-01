@@ -3,13 +3,15 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Marketplace.Contracts;
 using Marketplace.Domain.ClassifiedAds;
+using AutoFixture;
+using Xunit.Abstractions;
 
 namespace Marketplace.Tests
 {
-    using AutoFixture;
-
     public class Create_classified_ad : Specification<ClassifiedAd, ClassifiedAds.V1.Create>
     {
+        public Create_classified_ad(ITestOutputHelper output) : base(output) {}
+              
         public readonly Fixture AutoFixture = new Fixture();
 
         public override Func<ClassifiedAds.V1.Create, Task> GetHandler(SpecificationAggregateStore store)

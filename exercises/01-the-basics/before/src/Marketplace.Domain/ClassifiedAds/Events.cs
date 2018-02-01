@@ -13,6 +13,9 @@ namespace Marketplace.Domain.ClassifiedAds
                 public string Title { get; set; }
                 public DateTimeOffset CreatedAt { get; set; }
                 public Guid CreatedBy { get; set; }
+
+                public override string ToString()
+                    => $"Classified Ad {Id} was created.";
             }
         }
     }
