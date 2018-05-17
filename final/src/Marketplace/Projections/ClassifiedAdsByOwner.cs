@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
@@ -23,7 +24,7 @@ namespace Marketplace.Projections
                 switch (e)
                 {
                     case Events.V1.ClassifiedAdCreated x:
-                        var id = DocumentId(x.Id);
+                        var id = DocumentId(x.Owner);
 
                         var doc = await session.LoadAsync<ClassifiedAdsByOwnerDocument>(id);                    
                         if (doc == null)
@@ -44,6 +45,24 @@ namespace Marketplace.Projections
                         });
                         
                         break;
+                    
+                    case Events.V1.ClassifiedAdPriceChanged x:
+                        await session.UpdateOrThrow<ClassifiedAdsByOwnerDocument>(DocumentId(x.Owner),
+                            r =>
+                            {
+                                var ad = r.ListOfAds.First(a => a.Id == x.Id);
+                                ad.Price = x.Price;
+                            });
+                        break;
+                    
+                    case Events.V1.ClassifiedAdRenamed x:
+                        await session.UpdateOrThrow<ClassifiedAdsByOwnerDocument>(DocumentId(x.Owner),
+                            r =>
+                            {
+                                var ad = r.ListOfAds.First(a => a.Id == x.Id);
+                                ad.Title = x.Title;
+                            });
+                        break;
                 }
 
                 await session.SaveChangesAsync();
@@ -63,6 +82,7 @@ namespace Marketplace.Projections
             public Guid Id { get; set; }
             public string Title { get; set; }
             public string Status { get; set; }
+            public double Price { get; set; }
         }
         
         public enum ClassifiedAdStatus

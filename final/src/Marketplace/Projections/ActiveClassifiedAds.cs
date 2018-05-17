@@ -32,11 +32,11 @@ namespace Marketplace.Projections
                         break;
 
                     case Events.V1.ClassifiedAdRenamed x:
-                        await session.UpdateOrThrow<ActiveClassifiedAdDocument>(DocumentId(x.Id), r => r.Title = x.Title);
+                        await session.UpdateIfFound<ActiveClassifiedAdDocument>(DocumentId(x.Id), r => r.Title = x.Title);
                         break;
 
                     case Events.V1.ClassifiedAdPriceChanged x:
-                        await session.UpdateOrThrow<ActiveClassifiedAdDocument>(DocumentId(x.Id), r => r.Price = x.Price);
+                        await session.UpdateIfFound<ActiveClassifiedAdDocument>(DocumentId(x.Id), r => r.Price = x.Price);
                         break;
 
                     case Events.V1.ClassifiedAdDeactivated x:

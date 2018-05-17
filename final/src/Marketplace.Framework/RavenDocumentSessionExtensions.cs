@@ -15,5 +15,12 @@ namespace Marketplace.Framework
 
             update(doc);
         }
+        
+        public static async Task UpdateIfFound<T>(this IAsyncDocumentSession session, string id, Action<T> update)
+        {
+            var doc = await session.LoadAsync<T>(id);
+            if (doc != null) update(doc);
+        }
+        
     }
 }

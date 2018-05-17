@@ -41,6 +41,7 @@ namespace Marketplace
                 serializer,
                 typeMapper
             ));
+            services.AddScoped<ClassifiedAdsApplicationService>();
 
             var getSession = ConfigureRavenDb();
 
@@ -59,9 +60,6 @@ namespace Marketplace
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-                app.UseDeveloperExceptionPage();
-
             app.UseMvcWithDefaultRoute();
 
             app.UseSwagger();
@@ -74,6 +72,9 @@ namespace Marketplace
             
             mapper.Map<Events.V1.ClassifiedAdCreated>("ClassifiedAdCreated");
             mapper.Map<Events.V1.ClassifiedAdRenamed>("ClassifiedAdRenamed");
+            mapper.Map<Events.V1.ClassifiedAdPriceChanged>("ClassifiedAdPriceChanged");
+            mapper.Map<Events.V1.ClassifiedAdActivated>("ClassifiedAdActivated");
+            mapper.Map<Events.V1.ClassifiedAdDeactivated>("ClassifiedAdDeactivated");
             mapper.Map<Events.V1.ClassifiedAdPublished>("ClassifiedAdPublished");
             mapper.Map<Events.V1.ClassifiedAdMarkedAsSold>("ClassifiedAdMarkedAsSold");
 

@@ -21,6 +21,7 @@ namespace Marketplace.Domain.ClassifiedAds
             public class ClassifiedAdRenamed
             {
                 public Guid Id { get; set; }
+                public Guid Owner { get; set; }
                 public string Title { get; set; }
                 public DateTimeOffset RenamedAt { get; set; }
                 public Guid RenamedBy { get; set; }
@@ -32,6 +33,7 @@ namespace Marketplace.Domain.ClassifiedAds
             public class ClassifiedAdTextUpdated
             {
                 public Guid Id { get; set; }
+                public Guid Owner { get; set; }
                 public string AdText { get; set; }
                 public DateTimeOffset TextUpdatedAt { get; set; }
                 public Guid TextUpdatedBy { get; set; }
@@ -40,6 +42,7 @@ namespace Marketplace.Domain.ClassifiedAds
             public class ClassifiedAdPriceChanged
             {
                 public Guid Id { get; set; }
+                public Guid Owner { get; set; }
                 public double Price { get; set; }
                 public DateTimeOffset PriceChangedAt { get; set; }
                 public Guid PriceChangedBy { get; set; }

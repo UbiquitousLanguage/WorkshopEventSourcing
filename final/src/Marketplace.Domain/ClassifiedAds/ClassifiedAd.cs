@@ -10,6 +10,7 @@ namespace Marketplace.Domain.ClassifiedAds
         private Title _title;
         private AdText _text;
         private Price _price;
+        private Guid _owner;
 
         protected override void When(object e)
         {
@@ -18,6 +19,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 case Events.V1.ClassifiedAdCreated x:
                     Id = x.Id;
                     _title = x.Title;
+                    _owner = x.Owner;
                     break;
 
                 case Events.V1.ClassifiedAdRenamed x:
@@ -63,6 +65,7 @@ namespace Marketplace.Domain.ClassifiedAds
             Apply(new Events.V1.ClassifiedAdRenamed
             {
                 Id = Id,
+                Owner = _owner,
                 Title = title,
                 RenamedAt = renamedAt,
                 RenamedBy = renamedBy
@@ -73,6 +76,7 @@ namespace Marketplace.Domain.ClassifiedAds
             Apply(new Events.V1.ClassifiedAdTextUpdated
             {
                 Id = Id,
+                Owner = _owner,
                 AdText = text,
                 TextUpdatedAt = updatedAt,
                 TextUpdatedBy = updatedBy
@@ -82,6 +86,7 @@ namespace Marketplace.Domain.ClassifiedAds
             Apply(new Events.V1.ClassifiedAdPriceChanged
             {
                 Id = Id,
+                Owner = _owner,
                 Price = price,
                 PriceChangedAt = changedAt,
                 PriceChangedBy = changedBy
@@ -97,7 +102,14 @@ namespace Marketplace.Domain.ClassifiedAds
                 Text = _text
             });
 
-        public void Activate(DateTimeOffset activatedAt, UserId activatedBy) =>
+        public void Activate(DateTimeOffset activatedAt, UserId activatedBy)
+        {
+            if (_price == null)
+                throw new Exceptions.ClassifiedAdActivationException("Price should be specified");
+            
+            if (string.IsNullOrEmpty(_title))
+                throw new Exceptions.ClassifiedAdActivationException("Title cannot be empty");
+                
             Apply(new Events.V1.ClassifiedAdActivated
             {
                 Id = Id,
@@ -106,6 +118,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 ActivatedBy = activatedBy,
                 ActivatedAt = activatedAt
             });
+        }
 
         public void Reject(string reason, UserId rejectedBy, DateTimeOffset rejectedAt) =>
             Apply(new Events.V1.ClassifiedAdRejected
