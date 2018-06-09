@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
-using Microsoft.AspNetCore.Diagnostics;
 using Raven.Client.Documents.Session;
 
 namespace Marketplace.Projections

@@ -8,11 +8,11 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-    <PackageReference Include="AutoFixture.Xunit2" Version="4.0.0-rc1" />
-    <PackageReference Include="FluentAssertions" Version="4.19.4" />
-    <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.0.3-rc" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="RavenDB.Client" Version="4.0.0-rc-40025" />
+    <PackageReference Include="AutoFixture.Xunit2" Version="4.4.0" />
+    <PackageReference Include="FluentAssertions" Version="5.3.2" />
+    <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.1.0.23" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="RavenDB.Client" Version="4.0.3" />
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />

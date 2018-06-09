@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AutoFixture;
 using FluentAssertions;
 using Marketplace.Contracts;
 using Marketplace.Domain.ClassifiedAds;
-using AutoFixture;
 using Xunit.Abstractions;
 
 namespace Marketplace.Tests
@@ -25,12 +25,12 @@ namespace Marketplace.Tests
         [Then]
         public void Classified_ad_is_created()
         {
-            RaisedEvents.ShouldBeEquivalentTo(new [] { new Events.V1.ClassifiedAdCreated {
+            RaisedEvents.Should().BeEquivalentTo(new Events.V1.ClassifiedAdCreated {
                 Id        = Command.Id,
                 Owner     = Command.OwnerId,
                 CreatedBy = Command.CreatedBy,
                 CreatedAt = Command.CreatedAt
-            }});
+            });
         }
     }
 }

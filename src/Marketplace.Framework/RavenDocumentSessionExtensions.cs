@@ -21,6 +21,6 @@ namespace Marketplace.Framework
             var doc = await session.LoadAsync<T>(id);
             if (doc != null) update(doc);
         }
-        
+       
     }
 }

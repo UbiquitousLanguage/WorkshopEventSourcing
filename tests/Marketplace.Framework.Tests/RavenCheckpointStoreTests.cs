@@ -17,19 +17,15 @@ namespace Marketplace.Framework.Tests
             GetDocumentSession = () => LazyStore.Value.OpenAsyncSession();
         }
 
-        public void Dispose()
-        {
-            LazyStore.Value?.Dispose();
-        }
+        public void Dispose() => LazyStore.Value?.Dispose();
 
         private Func<IAsyncDocumentSession> GetDocumentSession { get; }
         private Fixture AutoFixture { get; }
 
         private static readonly Lazy<IDocumentStore> LazyStore = new Lazy<IDocumentStore>(() =>
         {
-            var store = new DocumentStore
-            {
-                Urls = new[] {"http://localhost:8080"},
+            var store = new DocumentStore {
+                Urls     = new[] {"http://localhost:8080"},
                 Database = "ClassifiedAds"
             };
 
@@ -45,11 +41,11 @@ namespace Marketplace.Framework.Tests
 
             Func<Task> setCheckpoint = () => sut.SetCheckpoint(expectedCheckpoint, projection);
 
-            setCheckpoint.ShouldNotThrow();
+            setCheckpoint.Should().NotThrow();
 
             var checkpoint = await sut.GetLastCheckpoint<Position>(projection);
 
-            checkpoint.ShouldBeEquivalentTo(expectedCheckpoint);
+            checkpoint.Should().BeEquivalentTo(expectedCheckpoint);
         }
     }
 }

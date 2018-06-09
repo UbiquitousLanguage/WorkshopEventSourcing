@@ -110,5 +110,4 @@ namespace Marketplace.Framework
         private static Action<EventStoreCatchUpSubscription> LiveProcessingStarted(Projection projection) 
             => _ => Log.Debug("{projection} projection has caught up, now processing live!", projection);
     }
-
 }

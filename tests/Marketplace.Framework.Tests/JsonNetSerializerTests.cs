@@ -7,10 +7,7 @@ namespace Marketplace.Framework.Tests
 {
     public class JsonNetSerializerTests
     {
-        public JsonNetSerializerTests()
-        {
-            AutoFixture = new Fixture();
-        }
+        public JsonNetSerializerTests() => AutoFixture = new Fixture();
 
         private Fixture AutoFixture { get; }
 
@@ -32,7 +29,7 @@ namespace Marketplace.Framework.Tests
             var result = (GameOver) sut.Deserialize(sut.Serialize(expectedResult), typeof(GameOver));
 
             //assert 
-            result.ShouldBeEquivalentTo(expectedResult);
+            result.Should().BeEquivalentTo(expectedResult);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Marketplace.Framework.Tests
     {
         public GesAggregateStoreTests()
         {
-            Connection = GetConnection().Result;
+            Connection = GetConnection().GetAwaiter().GetResult();
             Serializer = new JsonNetSerializer();
             TypeMapper = new TypeMapper();
             AutoFixture = new Fixture();
@@ -55,7 +55,7 @@ namespace Marketplace.Framework.Tests
 
             // act & assert           
 
-            result.NextExpectedVersion.ShouldBeEquivalentTo(2);
+            result.NextExpectedVersion.Should().Be(2);
         }
     }
 }

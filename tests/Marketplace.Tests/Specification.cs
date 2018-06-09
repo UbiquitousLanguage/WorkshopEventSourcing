@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 using Marketplace.Framework;
 using Xunit.Abstractions;
 
@@ -16,8 +15,7 @@ namespace Marketplace.Tests
         {
             _output = output;
             
-            History = Given();
-            
+            History = Given();           
             Command = When();
 
             var sut = new TAggregate();
@@ -40,7 +38,7 @@ namespace Marketplace.Tests
             Print();
         }
 
-        private object[] History { get; set; } 
+        public object[] History { get; private set; } 
         
         public TCommand Command { get; }
   
