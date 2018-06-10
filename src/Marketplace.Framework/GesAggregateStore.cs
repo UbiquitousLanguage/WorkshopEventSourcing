@@ -6,18 +6,17 @@ using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
 using EventStore.ClientAPI.SystemData;
 using Marketplace.Framework.Logging;
+using static System.String;
 
 namespace Marketplace.Framework
 {
-    using static String;
-
     public class GesAggregateStore : IAggregateStore
     {
         private const int MaxReadSize = 4096;
 
         private static readonly ILog Log = LogProvider.For<GesAggregateStore>();
+        
         private readonly IEventStoreConnection _connection;
-
         private readonly GetStreamName _getStreamName;
         private readonly ISerializer _serializer;
         private readonly TypeMapper _typeMapper;
@@ -65,7 +64,7 @@ namespace Marketplace.Framework
                 nextPageStart = !page.IsEndOfStream ? page.NextEventNumber : -1;
             } while (nextPageStart != -1);
 
-            Log.Info("Loaded {aggregate} changes from stream {stream}", aggregate, stream);
+            Log.Debug("Loaded {aggregate} changes from stream {stream}", aggregate, stream);
 
             return aggregate;
         }
@@ -110,7 +109,10 @@ namespace Marketplace.Framework
                     $"{(page.Status == SliceReadStatus.StreamNotFound ? "Stream not found!" : $"Current Version: {page.LastEventNumber}")}");
             }
 
-            Log.Info("Saved {aggregate} changes into stream {streamName}", aggregate, stream);
+            Log.Debug("Saved {count} {aggregate} change(s) into stream {streamName}", changes.Length, aggregate, stream);
+
+            foreach (var change in aggregate.GetChanges())
+                Log.Info(change.ToString);
 
             return (
                 result.NextExpectedVersion,

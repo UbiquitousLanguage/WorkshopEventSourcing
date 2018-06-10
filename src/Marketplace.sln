@@ -10,6 +10,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace", "Marketplace\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Tests", "..\tests\Marketplace.Tests\Marketplace.Tests.csproj", "{F20A7439-C53B-4F86-91BE-13CE9458260C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Metadata", ".Metadata", "{53CF069D-38C7-4207-BEB8-604851820509}"
+ProjectSection(SolutionItems) = preProject
+	..\docker-compose.yml = ..\docker-compose.yml
+	..\LICENSE = ..\LICENSE
+	..\Practical Event-Sourcing.jpg = ..\Practical Event-Sourcing.jpg
+	..\README.md = ..\README.md
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -9,10 +9,9 @@ namespace Marketplace.Framework
     public class ProjectionManager
     {
         public static readonly ProjectionManagerBuilder With = new ProjectionManagerBuilder();
-
         private static readonly ILog Log = LogProvider.For<ProjectionManager>();
+        
         private readonly ICheckpointStore _checkpointStore;
-
         private readonly IEventStoreConnection _connection;
         private readonly int _maxLiveQueueSize;
         private readonly Projection[] _projections;
@@ -63,13 +62,17 @@ namespace Marketplace.Framework
                 // get the configured clr type name for deserializing the event
                 var eventType = _typeMapper.GetType(e.Event.EventType);
 
+                // deserialize event
+                var domainEvent = _serializer.Deserialize(e.Event.Data, eventType);
+                
                 // try to execute the projection
-                await projection.Handle(_serializer.Deserialize(e.Event.Data, eventType));
+                await projection.Handle(domainEvent);
 
-                Log.Trace("{projection} projected {eventType}({eventId})", projection, e.Event.EventType, e.Event.EventId);
-
+                // log
+                Log.Debug("{event} projected into {projection}", domainEvent, projection);
+                
                 // store the current checkpoint
-                await _checkpointStore.SetCheckpoint(e.OriginalPosition, projection);
+                await _checkpointStore.SetCheckpoint(e.OriginalPosition.Value, projection);
             };
 
         private Action<EventStoreCatchUpSubscription, SubscriptionDropReason, Exception>SubscriptionDropped(Projection projection) 

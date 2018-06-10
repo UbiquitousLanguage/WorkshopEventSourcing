@@ -1,28 +1,29 @@
-﻿using System.Threading.Tasks;
-using Marketplace.Framework;
+﻿using System;
+using System.Threading.Tasks;
+using Marketplace.Domain.ClassifiedAds;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marketplace
 {
-    using System;
-    using Domain.ClassifiedAds;
-
     [Route("/ad")]
     public class ClassifiedAdsCommandsApi : Controller
     {
+        private static readonly Serilog.ILogger Log = Serilog.Log.ForContext<ClassifiedAdsCommandsApi>();
+
         private readonly ClassifiedAdsApplicationService _appService;
 
-        public ClassifiedAdsCommandsApi(ClassifiedAdsApplicationService appService)
-        {
-            _appService = appService;
-        }
+        public ClassifiedAdsCommandsApi(ClassifiedAdsApplicationService appService) => _appService = appService;
 
         /// <summary>
         ///     Create a new classified ad
         /// </summary>
         [HttpPost]
-        public Task Post(Contracts.ClassifiedAds.V1.Create request) =>
-            _appService.Handle(request);
+        public async Task<IActionResult> Post(Contracts.ClassifiedAds.V1.Create request)
+        {
+            Log.Information(request.ToString());
+            await _appService.Handle(request);
+            return Ok();
+        }
 
         /// <summary>
         ///    Rename a classified ad
@@ -80,7 +81,8 @@ namespace Marketplace
         {
             try
             {
-                await handler(request);
+                Log.Information(request.ToString());
+                await handler(request).ConfigureAwait(false);
                 return Ok();
             }
             catch (Exceptions.ClassifiedAdNotFoundException)

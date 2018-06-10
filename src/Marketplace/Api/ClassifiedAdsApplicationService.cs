@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Marketplace.Contracts;
 using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
+using Serilog;
 
 namespace Marketplace
 {
@@ -10,10 +11,7 @@ namespace Marketplace
     {
         private readonly IAggregateStore _store;
 
-        public ClassifiedAdsApplicationService(IAggregateStore store)
-        {
-            _store = store;
-        }
+        public ClassifiedAdsApplicationService(IAggregateStore store) => _store = store;
 
         public Task Handle(ClassifiedAds.V1.Create command) =>
             _store.Save(ClassifiedAd.Create(
@@ -76,7 +74,7 @@ namespace Marketplace
         {
             var ad = await _store.Load<ClassifiedAd>(id.ToString());
             update(ad);
-            await _store.Save(ad);
+            await _store.Save(ad).ConfigureAwait(false);
         }
     }
 }

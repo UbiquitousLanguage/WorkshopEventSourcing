@@ -25,23 +25,14 @@ namespace Marketplace.Framework
             return this;
         }
 
-        public bool TryGetType(string name, out Type type)
-        {
-            return _typesByName.TryGetValue(name, out type);
-        }
+        public bool TryGetType(string name, out Type type) => _typesByName.TryGetValue(name, out type);
 
-        public bool TryGetTypeName(Type type, out string name)
-        {
-            return _namesByType.TryGetValue(type, out name);
-        }
+        public bool TryGetTypeName(Type type, out string name) => _namesByType.TryGetValue(type, out name);
     }
 
     public static class TypeMapperExtensions
     {
-        public static TypeMapper Map<T>(this TypeMapper mapper, string name)
-        {
-            return mapper.Map(typeof(T), name);
-        }
+        public static TypeMapper Map<T>(this TypeMapper mapper, string name) => mapper.Map(typeof(T), name);
 
         public static string GetTypeName(this TypeMapper mapper, Type type)
         {

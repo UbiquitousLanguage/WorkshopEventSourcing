@@ -46,7 +46,6 @@ namespace Marketplace.Projections
         }
 
         private static string DocumentId(Guid id) => $"ActiveClassifiedAds/{id}";
-
     }
 
     public class ActiveClassifiedAdDocument

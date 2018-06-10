@@ -12,11 +12,8 @@ namespace Marketplace.Projections
     {
         private readonly Func<IAsyncDocumentSession> _getSession;
         
-        public ClassifiedAdsByOwner(Func<IAsyncDocumentSession> getSession)
-        {
-            _getSession = getSession;
-        }
-        
+        public ClassifiedAdsByOwner(Func<IAsyncDocumentSession> getSession) => _getSession = getSession;
+
         public override async Task Handle(object e)
         {
             using (var session = _getSession())
@@ -43,7 +40,6 @@ namespace Marketplace.Projections
                             Status = "New",
                             Title = x.Title
                         });
-                        
                         break;
                     
                     case Events.V1.ClassifiedAdPriceChanged x:

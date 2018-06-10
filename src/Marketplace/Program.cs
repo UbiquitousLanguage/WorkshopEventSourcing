@@ -1,55 +1,69 @@
 ﻿using System;
 using System.IO;
-using Microsoft.AspNetCore;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
+using static System.Environment;
+using static System.Reflection.Assembly;
 
 namespace Marketplace
 {
-    class Program
+    static class Program
     {
-        static int Main(string[] args)
+        static Program() => CurrentDirectory = Path.GetDirectoryName(GetEntryAssembly().Location);
+
+        static async Task<int> Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .CreateLogger();
+            await Console.Error.WriteLineAsync(
+                $"Application starting ({GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"})...");
 
             try
             {
-                Log.Information("Starting web host");
-                BuildWebHost(args).Run();
+                var configuration = BuildConfiguration(args);
+            
+                await Console.Error.WriteLineAsync("Configuration built successfully.");
+                
+                Log.Logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(configuration)
+                    .CreateLogger();
+                
+                await ConfigureWebHost(configuration).Build().RunAsync();
+                
                 return 0;
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "Host terminated unexpectedly");
+                if (!Log.IsEnabled(LogEventLevel.Fatal))
+                    await Console.Error.WriteLineAsync($"Terminated unexpectedly! {ex.Message}");
+                else
+                    Log.Fatal(ex, "Terminated unexpectedly!");
+                
                 return 1;
             }
             finally
             {
-                Log.Information("Shutting down...");
                 Log.CloseAndFlush();
             }
         }
-
-        private static IWebHost BuildWebHost(string[] args)
-        {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true)
+        
+        public static IConfiguration BuildConfiguration(string[] args)
+            => new ConfigurationBuilder()
+                .SetBasePath(CurrentDirectory)
+                .AddJsonFile("appsettings.json", false, false)
+                .AddJsonFile($"appsettings.{GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", true)
+                .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();
-            
-            return WebHost.CreateDefaultBuilder(args)
-                .UseConfiguration(config)
+
+        public static IWebHostBuilder ConfigureWebHost(IConfiguration configuration)
+            => new WebHostBuilder()
                 .UseStartup<Startup>()
-                .UseSerilog()
-                .Build();
-        }
+                .UseConfiguration(configuration)
+                .ConfigureServices(services => services.AddSingleton(configuration))
+                .UseContentRoot(CurrentDirectory)
+                .UseKestrel();
     }
 }

@@ -11,10 +11,7 @@ namespace Marketplace.Framework
 
         private readonly Func<IAsyncDocumentSession> _getSession;
 
-        public RavenCheckpointStore(Func<IAsyncDocumentSession> getSession)
-        {
-            _getSession = getSession;
-        }
+        public RavenCheckpointStore(Func<IAsyncDocumentSession> getSession) => _getSession = getSession;
 
         public async Task<T> GetLastCheckpoint<T>(string projection)
         {
@@ -27,7 +24,7 @@ namespace Marketplace.Framework
                 if (doc != null)
                 {
                     var checkpoint = (T) doc.Checkpoint;
-                    Log.Debug("{projection} last checkpoint is {@checkpoint}", projection, checkpoint);
+                    Log.Debug("{projection} last checkpoint is {checkpoint}", projection, checkpoint);
                     return checkpoint;
                 }
 
@@ -38,7 +35,7 @@ namespace Marketplace.Framework
 
         public async Task SetCheckpoint<T>(T checkpoint, string projection)
         {
-            Log.Trace("Setting checkpoint {@checkpoint} for {projection}...", checkpoint, projection);
+            Log.Trace("Setting checkpoint {checkpoint} for {projection}...", checkpoint, projection);
 
             using (var session = _getSession())
             {
@@ -52,7 +49,7 @@ namespace Marketplace.Framework
 
                 await session.SaveChangesAsync();
 
-                Log.Debug("{projection} checkpoint set to {@checkpoint}", projection, checkpoint);
+                Log.Debug("{projection} checkpoint set to {checkpoint}", projection, checkpoint);
             }
         }
 

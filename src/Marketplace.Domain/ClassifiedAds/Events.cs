@@ -15,7 +15,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 public Guid CreatedBy { get; set; }
                 
                 public override string ToString() 
-                    => $"Classified Ad {Id} was created.";      
+                    => $"Classified Ad {Id} created.";      
             }
 
             public class ClassifiedAdRenamed
@@ -27,7 +27,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 public Guid RenamedBy { get; set; }
                 
                 public override string ToString() 
-                    => $"Classified Ad {Id} was renamed to '{(Title?.Length > 25 ? $"{Title?.Substring(0, 22)}..." : Title )}'";
+                    => $"Classified Ad {Id} renamed to '{(Title?.Length > 25 ? $"{Title?.Substring(0, 22)}..." : Title )}'";
             }
             
             public class ClassifiedAdTextUpdated

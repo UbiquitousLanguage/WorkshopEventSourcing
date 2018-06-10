@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
-using Microsoft.AspNetCore.Diagnostics;
 using Raven.Client.Documents.Session;
 
 namespace Marketplace.Projections
@@ -12,10 +10,7 @@ namespace Marketplace.Projections
     {
         private readonly Func<IAsyncDocumentSession> _getSession;
 
-        public ClassifiedAdsPendingActivation(Func<IAsyncDocumentSession> getSession)
-        {
-            _getSession = getSession;
-        }
+        public ClassifiedAdsPendingActivation(Func<IAsyncDocumentSession> getSession) => _getSession = getSession;
 
         public override async Task Handle(object e)
         {
