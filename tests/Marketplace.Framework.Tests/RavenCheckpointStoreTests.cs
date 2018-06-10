@@ -37,7 +37,7 @@ namespace Marketplace.Framework.Tests
         {
             var sut = new RavenCheckpointStore(GetDocumentSession);
             var projection = AutoFixture.Create<string>();
-            var expectedCheckpoint = AutoFixture.Create<Position>();
+            var expectedCheckpoint = new Position();
 
             Func<Task> setCheckpoint = () => sut.SetCheckpoint(expectedCheckpoint, projection);
 

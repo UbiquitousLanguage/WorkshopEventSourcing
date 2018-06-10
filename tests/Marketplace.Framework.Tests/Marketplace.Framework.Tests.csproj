@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <PackageReference Include="AutoFixture.Xunit2" Version="4.4.0" />
@@ -15,18 +15,8 @@
     <PackageReference Include="RavenDB.Client" Version="4.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Marketplace.Domain\Marketplace.Domain.csproj">
-      <Project>{9AB26E16-316F-4140-9342-937D3D61A073}</Project>
-      <Name>Marketplace.Domain</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\src\Marketplace.Domain\Marketplace.Domain.csproj" />
     <ProjectReference Include="..\..\src\Marketplace.Framework\Marketplace.Framework.csproj" />
-    <ProjectReference Include="..\..\src\Marketplace.Framework\Marketplace.Framework.csproj" />
-    <ProjectReference Include="..\..\src\Marketplace\Marketplace.csproj">
-      <Project>{5CDD7B63-9D54-4286-9EC0-D5375885BE71}</Project>
-      <Name>Marketplace</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\src\Marketplace\Marketplace.csproj" />
   </ItemGroup>
 </Project>
