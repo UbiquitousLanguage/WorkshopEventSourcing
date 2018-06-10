@@ -42,7 +42,7 @@ namespace Marketplace
         {
             var gesConnection = EventStoreConnection.Create(
                 Configuration["EventStore:ConnectionString"], 
-                //ConnectionSettings.Create().KeepReconnecting(),
+                ConnectionSettings.Create().KeepReconnecting(),
                 Environment.ApplicationName);
             
             gesConnection.Connected += (sender, args) 
