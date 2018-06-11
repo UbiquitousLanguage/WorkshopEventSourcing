@@ -46,7 +46,7 @@ namespace Marketplace
                 Environment.ApplicationName);
             
             gesConnection.Connected += (sender, args) 
-                => Log.Information("Connection to {eventStore} event store established.", gesConnection.ConnectionName);
+                => Log.Information("Connection to {endpoint} event store established.", args.RemoteEndPoint);
             
             await gesConnection.ConnectAsync();
  
@@ -116,13 +116,13 @@ namespace Marketplace
             
             try 
             {
-                store.Initialize();          
-                Log.Information("Initialized {database} document store.", store.Database);
+                store.Initialize();                
+                Log.Information("Connection to {url} document store established.", store.Urls[0]);
             }
             catch (Exception ex)
             {
                 throw new ApplicationException(
-                    $"Failed to initialize \"{store.Database}\" document store!" +
+                    $"Failed to establish connection to \"{store.Urls[0]}\" document store!" +
                     $"Please check if https is properly configured in order to use the certificate.", ex);
             }
 
@@ -134,24 +134,25 @@ namespace Marketplace
                     store.Maintenance.Server
                         .Send(new CreateDatabaseOperation(new DatabaseRecord(store.Database)));
 
-                    Log.Information("{database} document store created.", store.Database);
+                    Log.Debug("{database} document store database created.", store.Database);
                 }
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Failed to ensure that \"{store.Database}\" document store exists!", ex);
+                throw new ApplicationException(
+                    $"Failed to ensure that \"{store.Database}\" document store database exists!", ex);
             }
             
             try
             {
                 IndexCreation.CreateIndexes(Assembly.GetExecutingAssembly(), store);
-                Log.Information("{database} document store indexes created or updated.", store.Database);
+                Log.Information("{database} document store database indexes created or updated.", store.Database);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Failed to create \"{store.Database}\" document store indexes!", ex);
+                throw new ApplicationException($"Failed to create or update \"{store.Database}\" document store database indexes!", ex);
             }
-
+            
             return store;
         }
     }
