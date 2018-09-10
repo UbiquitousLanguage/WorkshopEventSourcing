@@ -11,9 +11,10 @@ using static System.Reflection.Assembly;
 
 namespace Marketplace
 {
-    static class Program
+    public static class Program
     {
-        static Program() => CurrentDirectory = Path.GetDirectoryName(GetEntryAssembly().Location);
+        static Program() =>
+            CurrentDirectory = Path.GetDirectoryName(GetEntryAssembly().Location);
 
         static async Task<int> Main(string[] args)
         {
@@ -23,15 +24,15 @@ namespace Marketplace
             try
             {
                 var configuration = BuildConfiguration(args);
-            
+
                 await Console.Error.WriteLineAsync("Configuration built successfully.");
-                
+
                 Log.Logger = new LoggerConfiguration()
                     .ReadFrom.Configuration(configuration)
                     .CreateLogger();
-                
+
                 await ConfigureWebHost(configuration).Build().RunAsync();
-                
+
                 return 0;
             }
             catch (Exception ex)
@@ -40,7 +41,7 @@ namespace Marketplace
                     await Console.Error.WriteLineAsync($"Terminated unexpectedly! {ex.Message}");
                 else
                     Log.Fatal(ex, "Terminated unexpectedly!");
-                
+
                 return 1;
             }
             finally
@@ -48,8 +49,8 @@ namespace Marketplace
                 Log.CloseAndFlush();
             }
         }
-        
-        public static IConfiguration BuildConfiguration(string[] args)
+
+        private static IConfiguration BuildConfiguration(string[] args)
             => new ConfigurationBuilder()
                 .SetBasePath(CurrentDirectory)
                 .AddJsonFile("appsettings.json", false, false)

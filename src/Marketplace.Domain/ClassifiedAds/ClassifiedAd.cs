@@ -18,7 +18,7 @@ namespace Marketplace.Domain.ClassifiedAds
             {
                 case Events.V1.ClassifiedAdCreated x:
                     Id = x.Id;
-                    _title = x.Title;
+                    _title = new Title(x.Title);
                     _owner = x.Owner;
                     break;
 

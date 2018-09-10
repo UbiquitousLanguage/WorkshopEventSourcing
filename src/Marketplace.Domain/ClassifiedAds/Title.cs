@@ -1,18 +1,24 @@
-﻿using Marketplace.Framework;
+﻿using System;
+using Marketplace.Framework;
 
 namespace Marketplace.Domain.ClassifiedAds
 {
     public class Title : Value<Title>
     {
-        public string Value { get; }
+        private string Value { get; }
 
-        public Title(string value)
+        public static Title Parse(string value)
         {
-            Value = value;
+            if (value.Length > 100)
+                throw new ArgumentOutOfRangeException(nameof(value), "Too long title");
+
+            return new Title(value);
         }
+
+        internal Title(string value) => Value = value;
 
         public static implicit operator string(Title self) => self.Value;
 
-        public static implicit operator Title(string value) => new Title(value);
+        public static implicit operator Title(string value) => Parse(value);
     }
 }
