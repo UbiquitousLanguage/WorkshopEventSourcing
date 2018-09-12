@@ -16,7 +16,7 @@ Note that Docker Compose might _not_ included to your version of Docker, so you 
 
 > In case you are unable to use Docker Compose, please download the following products:
 >- [EventStore](https://eventstore.org/downloads/)
->- [RavenDB 4.0 RC](https://ravendb.net/downloads)
+>- [RavenDB 4](https://ravendb.net/downloads)
 
 *Important:* carefully read this section and ensure that everything works on your machine _before_ the workshop. When using Docker Compose, downloading images requires significant bandwidth and we will not be able to do it during the workshop due to the venue WiFi capacity.
 
