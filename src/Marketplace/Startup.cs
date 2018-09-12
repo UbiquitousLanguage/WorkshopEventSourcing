@@ -68,8 +68,10 @@ namespace Marketplace
                 serializer,
                 typeMapper);
 
+            var purgomalumClient = new PurgomalumClient();
+            
             services.AddSingleton(new ClassifiedAdsApplicationService(
-                aggregateStore, () => DateTimeOffset.UtcNow, text => new PurgomalumClient().CheckForProfanity(text)));
+                aggregateStore, () => DateTimeOffset.UtcNow, text => purgomalumClient.CheckForProfanity(text)));
             
             var documentStore = ConfigureRaven();
 

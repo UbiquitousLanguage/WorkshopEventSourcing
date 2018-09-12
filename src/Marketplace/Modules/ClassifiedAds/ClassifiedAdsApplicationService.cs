@@ -78,5 +78,12 @@ namespace Marketplace.Modules.ClassifiedAds
             update(ad);
             await _store.Save(ad);
         }
+        
+        private async Task HandleUpdate(Guid id, Func<ClassifiedAd, Task> update)
+        {
+            var ad = await _store.Load<ClassifiedAd>(id.ToString());
+            await update(ad);
+            await _store.Save(ad);
+        }
     }
 }
