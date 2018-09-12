@@ -6,8 +6,8 @@ Due to the time limitation, there are many aspects of event-sourcing, which we w
 
 ## Prerequisites
 
-- .NET Core 2
-- C# IDE or editor of your choice (for example Visual Studio 2017, Rider or VS Code)
+- .NET Core 2.1
+- C# IDE or editor of your choice (for example Jetbrains Rider, VS Code or Visual Studio 2017)
 - Docker Compose
 
 The solution is using C# 7.1 features so if you are using Visual Studio - ensure you have VS 2017. Rider supports the latest C# by default or will ask you if you want to enable it.
@@ -59,7 +59,7 @@ If you are unable or do not with to use Docker Compose, you can download EventSt
 EventStore installation instructions for Ubuntu is located [here](https://eventstore.org/docs/server/installing-from-debian-repositories/)
 and instructions for running a Windows instance can be found [here](https://eventstore.org/docs/server/).
 
-RavenDb 4.0RC can be downloaded for all platform using the link above.
+RavenDb 4 can be downloaded for all platform using the link above.
 
 Please reconsider using Docker Compose, since it is the easiest way to get started without installing anything.
 
@@ -67,15 +67,13 @@ You can use an existing installation of the EventStore and build your read model
 
 ## Structure
 
-The workshop source files are located in the `src` folder and there are several stages:
+The workshop source files are located in the `steps` folder and there are several stages:
 
-- `01-` is to get things started
-- `02-` shows how events are being persisted
-- `03-` explains how to build your first read model
-- `04-` demonstrates how event-sourced aggregates can be tested
-- `05-` is where we build another read model
+- `1_the_beginning` is to get things started
+- `2_event_streams` shows how events are being persisted
+- `3_read_models` explains how to build read models
 
-Each section contains two folders - `before` and `after`. The first one contains the starting point for the section and the second one shows the completed code for the section. Of course, even the `after` version has a lot of potential for being improved.
+The final code is located in the `src` folder and it is meant to be close to production quality.
 
 ## What to do
 
