@@ -4,7 +4,7 @@ using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
 using Raven.Client.Documents.Session;
 
-namespace Marketplace.Projections
+namespace Marketplace.Modules.ClassifiedAds.Projections
 {
     public class ClassifiedAdsPendingActivation : Projection
     {

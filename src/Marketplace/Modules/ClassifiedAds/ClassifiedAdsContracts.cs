@@ -1,4 +1,6 @@
-﻿using System;
+using System;
+
+// ReSharper disable CheckNamespace
 
 namespace Marketplace.Contracts
 {
@@ -35,12 +37,7 @@ namespace Marketplace.Contracts
                 ///     The new title
                 /// </summary>
                 public string Title { get; set; }
-                
-                /// <summary>
-                ///     Rename date
-                /// </summary>
-                public DateTimeOffset RenamedAt { get; set; }
-                
+
                 /// <summary>
                 ///     Id of the user who renamed the ad
                 /// </summary>
@@ -54,7 +51,6 @@ namespace Marketplace.Contracts
             {
                 public Guid Id { get; set; }
                 public string Text { get; set; }
-                public DateTimeOffset TextChangedAt { get; set; }
                 public Guid TextChangedBy { get; set; }
             }
 
@@ -62,7 +58,6 @@ namespace Marketplace.Contracts
             {
                 public Guid Id { get; set; }
                 public double Price { get; set; }
-                public DateTimeOffset PriceChangedAt { get; set; }
                 public Guid PriceChangedBy { get; set; }
             }
 
@@ -70,14 +65,12 @@ namespace Marketplace.Contracts
             {
                 public Guid Id { get; set; }
                 public Guid PublishedBy { get; set; }
-                public DateTimeOffset PublishedAt { get; set; }
             }
 
             public class Activate
             {
                 public Guid Id { get; set; }
                 public Guid ActivatedBy { get; set; }
-                public DateTimeOffset ActivatedAt { get; set; }
             }
 
             public class Reject
@@ -85,7 +78,6 @@ namespace Marketplace.Contracts
                 public Guid Id { get; set; }
                 public string Reason { get; set; }
                 public Guid RejectedBy { get; set; }
-                public DateTimeOffset RejectedAt { get; set; }
             }
 
             public class Report
@@ -93,28 +85,36 @@ namespace Marketplace.Contracts
                 public Guid Id { get; set; }
                 public string Reason { get; set; }
                 public Guid ReportedBy { get; set; }
-                public DateTimeOffset ReportedAt { get; set; }
             }
 
             public class Deactivate
             {
                 public Guid Id { get; set; }
                 public Guid DeactivatedBy { get; set; }
-                public DateTimeOffset DeactivatedAt { get; set; }
             }
 
             public class MarkAsSold
             {
                 public Guid Id { get; set; }
                 public Guid MarkedBy { get; set; }
-                public DateTimeOffset MarkedAt { get; set; }
             }
 
             public class Remove
             {
                 public Guid Id { get; set; }
                 public Guid RemovedBy { get; set; }
-                public DateTimeOffset RemovedAt { get; set; }
+            }
+        }
+    }
+    
+    public static class Shared
+    {
+        public static class V1
+        {
+            public class Picture
+            {
+                public string Url { get; set; }
+                public string Description { get; set; }
             }
         }
     }

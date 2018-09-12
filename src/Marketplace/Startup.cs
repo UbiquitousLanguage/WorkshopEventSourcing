@@ -6,6 +6,8 @@ using EventStore.ClientAPI;
 using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
  using Marketplace.Infrastructure.Purgomalum;
+ using Marketplace.Modules.ClassifiedAds;
+ using Marketplace.Modules.ClassifiedAds.Projections;
  using Marketplace.Projections;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,8 +21,6 @@ using Raven.Client.ServerWide.Operations;
 using Swashbuckle.AspNetCore.Swagger;
 using static System.Environment;
 
-// ReSharper disable UnusedMember.Global
-
 namespace Marketplace
 {
     public class Startup
@@ -29,12 +29,12 @@ namespace Marketplace
         
         public Startup(IHostingEnvironment environment, IConfiguration configuration)
         {
-            Environment   = environment;
+            Environment = environment;
             Configuration = configuration;
         }
 
-        private IConfiguration      Configuration { get; }
-        private IHostingEnvironment Environment   { get; }
+        private IConfiguration Configuration { get; }
+        private IHostingEnvironment Environment { get; }
 
         public void ConfigureServices(IServiceCollection services) 
             => ConfigureServicesAsync(services).GetAwaiter().GetResult();

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Marketplace.Domain.ClassifiedAds;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marketplace
+namespace Marketplace.Modules.ClassifiedAds
 {
     [Route("/ad")]
     public class ClassifiedAdsCommandsApi : Controller
@@ -36,7 +36,7 @@ namespace Marketplace
         [Route("text")]
         [HttpPut]
         public Task<IActionResult> Put(Contracts.ClassifiedAds.V1.UpdateText request) =>
-            HandleOrThrow(request, x => _appService.Handle(x));
+            HandleOrThrow(request, _appService.Handle);
 
         [Route("price")]
         [HttpPut]
@@ -82,7 +82,7 @@ namespace Marketplace
             try
             {
                 Log.Information(request.ToString());
-                await handler(request).ConfigureAwait(false);
+                await handler(request);
                 return Ok();
             }
             catch (Exceptions.ClassifiedAdNotFoundException)

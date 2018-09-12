@@ -59,7 +59,7 @@ namespace Marketplace.Domain.ClassifiedAds
             return ad;
         }
 
-        public void Rename(Title title, DateTimeOffset renamedAt, UserId renamedBy)
+        public void Rename(Title title, UserId renamedBy, Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
                 throw new Exceptions.ClassifiedAdNotFoundException();       
@@ -69,12 +69,12 @@ namespace Marketplace.Domain.ClassifiedAds
                 Id = Id,
                 Owner = _owner,
                 Title = title,
-                RenamedAt = renamedAt,
-                RenamedBy = renamedBy
+                RenamedBy = renamedBy,
+                RenamedAt = getUtcNow()
             });
         }
 
-        public async Task UpdateText(AdText text, DateTimeOffset updatedAt, UserId updatedBy, CheckTextForProfanity checkTextForProfanity)
+        public async Task UpdateText(AdText text, UserId updatedBy, Func<DateTimeOffset> getUtcNow, CheckTextForProfanity checkTextForProfanity)
         {
             var containsProfanity = await checkTextForProfanity(text);
             if (containsProfanity)
@@ -85,32 +85,32 @@ namespace Marketplace.Domain.ClassifiedAds
                 Id = Id,
                 Owner = _owner,
                 AdText = text,
-                TextUpdatedAt = updatedAt,
-                TextUpdatedBy = updatedBy
+                TextUpdatedBy = updatedBy,
+                TextUpdatedAt = getUtcNow()
             });
         }
 
-        public void ChangePrice(Price price, DateTimeOffset changedAt, UserId changedBy) =>
+        public void ChangePrice(Price price, UserId changedBy, Func<DateTimeOffset> getUtcNow) =>
             Apply(new Events.V1.ClassifiedAdPriceChanged
             {
                 Id = Id,
                 Owner = _owner,
                 Price = price,
-                PriceChangedAt = changedAt,
-                PriceChangedBy = changedBy
+                PriceChangedBy = changedBy,
+                PriceChangedAt = getUtcNow()
             });
 
-        public void Publish(DateTimeOffset publishedAt, UserId publishedBy) =>
+        public void Publish(UserId publishedBy, Func<DateTimeOffset> getUtcNow) =>
             Apply(new Events.V1.ClassifiedAdPublished
             {
                 Id = Id,
-                PublishedBy = publishedBy,
-                PublishedAt = publishedAt,
                 Title = _title,
-                Text = _text
+                Text = _text,  
+                PublishedBy = publishedBy,
+                PublishedAt = getUtcNow()
             });
 
-        public void Activate(DateTimeOffset activatedAt, UserId activatedBy)
+        public void Activate(UserId activatedBy, Func<DateTimeOffset> getUtcNow)
         {
             if (_price == null)
                 throw new Exceptions.ClassifiedAdActivationException("Price should be specified");
@@ -124,50 +124,50 @@ namespace Marketplace.Domain.ClassifiedAds
                 Title = _title,
                 Price = _price,
                 ActivatedBy = activatedBy,
-                ActivatedAt = activatedAt
+                ActivatedAt = getUtcNow()
             });
         }
 
-        public void Reject(string reason, UserId rejectedBy, DateTimeOffset rejectedAt) =>
+        public void Reject(string reason, UserId rejectedBy, Func<DateTimeOffset> getUtcNow) =>
             Apply(new Events.V1.ClassifiedAdRejected
             {
                 Id = Id,
                 Reason = reason,
                 RejectedBy = rejectedBy,
-                RejectedAt = rejectedAt
+                RejectedAt = getUtcNow()
             });
 
-        public void Report(string reason, UserId reportedBy, DateTimeOffset reportedAt) =>
+        public void Report(string reason, UserId reportedBy, Func<DateTimeOffset> getUtcNow) =>
             Apply(new Events.V1.ClassifiedAdReportedByUser
             {
                 Id = Id,
                 Reason = reason,
                 ReportedBy = reportedBy,
-                ReportedAt = reportedAt
+                ReportedAt = getUtcNow()
             });
         
-        public void MarkAsSold(UserId markedBy, DateTimeOffset markedAt) =>
+        public void MarkAsSold(UserId markedBy, Func<DateTimeOffset> getUtcNow) =>
             Apply(new Events.V1.ClassifiedAdMarkedAsSold
             {
                 Id = Id,
                 MarkedAsSoldBy = markedBy,
-                MarkedAsSoldAt = markedAt
+                MarkedAsSoldAt = getUtcNow()
             });
 
-        public void Deactivate(UserId deactivatedBy, DateTimeOffset deactivayedAt) =>
+        public void Deactivate(UserId deactivatedBy, Func<DateTimeOffset> getUtcNow) =>
             Apply(new Events.V1.ClassifiedAdDeactivated
             {
                 Id = Id,
                 DeactivatedBy = deactivatedBy,
-                DeactivatedAt = deactivayedAt
+                DeactivatedAt = getUtcNow()
             });
 
-        public void Remove(UserId removedBy, DateTimeOffset removedAt) =>
+        public void Remove(UserId removedBy, Func<DateTimeOffset> getUtcNow) =>
             Apply(new Events.V1.ClassifiedAdRemoved
             {
                 Id = Id,
                 RemovedBy = removedBy,
-                RemovedAt = removedAt
+                RemovedAt = getUtcNow()
             });
     }
 }

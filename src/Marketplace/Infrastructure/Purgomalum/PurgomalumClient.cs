@@ -21,7 +21,8 @@ namespace Marketplace.Infrastructure.Purgomalum
             var result = await _httpClient.GetAsync(
                 QueryHelpers.AddQueryString("https://www.purgomalum.com/service/containsprofanity", "text", text));
             
-            return await result.Content.ReadAsAsync<bool>();
+            var value = await result.Content.ReadAsStringAsync();
+            return bool.Parse(value);
         }
     }
 }
