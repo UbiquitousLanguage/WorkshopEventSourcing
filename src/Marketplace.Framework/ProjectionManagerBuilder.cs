@@ -5,8 +5,6 @@ namespace Marketplace.Framework
 {
     public class ProjectionManagerBuilder
     {
-        public static readonly ProjectionManagerBuilder With = new ProjectionManagerBuilder();
-        
         private ICheckpointStore _checkpointStore;
         private IEventStoreConnection _connection;
         private int? _maxLiveQueueSize;

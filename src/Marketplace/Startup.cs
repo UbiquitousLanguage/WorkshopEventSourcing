@@ -1,16 +1,19 @@
 ﻿﻿using System;
-using System.Reflection;
+ using System.Net.Http;
+ using System.Reflection;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
-using Marketplace.Projections;
+ using Marketplace.Infrastructure.Purgomalum;
+ using Marketplace.Projections;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Indexes;
+using Raven.Client.Documents.Session;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
 using Swashbuckle.AspNetCore.Swagger;
@@ -33,8 +36,6 @@ namespace Marketplace
         private IConfiguration      Configuration { get; }
         private IHostingEnvironment Environment   { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        //public void ConfigureServices(IServiceCollection services)
         public void ConfigureServices(IServiceCollection services) 
             => ConfigureServicesAsync(services).GetAwaiter().GetResult();
 
@@ -66,19 +67,22 @@ namespace Marketplace
                 gesConnection,
                 serializer,
                 typeMapper);
-            
-            services.AddSingleton(new ClassifiedAdsApplicationService(aggregateStore));
-            
-            var documentStore = ConfigureRaven(services);
 
-            await ProjectionManagerBuilder.With
+            services.AddSingleton(new ClassifiedAdsApplicationService(
+                aggregateStore, () => DateTimeOffset.UtcNow, text => new PurgomalumClient().CheckForProfanity(text)));
+            
+            var documentStore = ConfigureRaven();
+
+            IAsyncDocumentSession GetSession() => documentStore.OpenAsyncSession();
+
+            await ProjectionManager.With
                 .Connection(gesConnection)
                 .Serializer(serializer)
                 .TypeMapper(typeMapper)
-                .CheckpointStore(new RavenCheckpointStore(() => documentStore.OpenAsyncSession()))
+                .CheckpointStore(new RavenCheckpointStore(GetSession))
                 .Projections(
-                    new ClassifiedAdsByOwner(() => documentStore.OpenAsyncSession()),
-                    new ActiveClassifiedAds(() => documentStore.OpenAsyncSession()))
+                    new ClassifiedAdsByOwner(GetSession),
+                    new ActiveClassifiedAds(GetSession))
                 .Activate();
             
             services.AddMvc();
@@ -94,7 +98,6 @@ namespace Marketplace
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
             app.UseMvcWithDefaultRoute();
@@ -104,7 +107,7 @@ namespace Marketplace
                 Configuration["Swagger:Endpoint:Name"]));
         }
 
-        private IDocumentStore ConfigureRaven(IServiceCollection services)
+        private IDocumentStore ConfigureRaven()
         {
             var store = new DocumentStore {
                 Urls     = new[] {Configuration["RavenDb:Url"]},

@@ -18,7 +18,7 @@ namespace Marketplace
         ///     Create a new classified ad
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Post(Contracts.ClassifiedAds.V1.Create request)
+        public async Task<IActionResult> Post(Contracts.ClassifiedAds.V1.CreateAd request)
         {
             Log.Information(request.ToString());
             await _appService.Handle(request);

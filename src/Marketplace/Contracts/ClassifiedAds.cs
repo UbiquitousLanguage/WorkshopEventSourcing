@@ -9,7 +9,7 @@ namespace Marketplace.Contracts
             /// <summary>
             ///     Create a new ad command
             /// </summary>
-            public class Create
+            public class CreateAd
             {
                 /// <summary>
                 ///     New ad id
@@ -20,16 +20,6 @@ namespace Marketplace.Contracts
                 ///     Ad owner id
                 /// </summary>
                 public Guid OwnerId { get; set; }
-                
-                /// <summary>
-                ///     Creation date
-                /// </summary>
-                public DateTimeOffset CreatedAt { get; set; }
-                
-                /// <summary>
-                ///     Id of the user who created the ad
-                /// </summary>
-                public Guid CreatedBy { get; set; }
 
                 public override string ToString() => $"Creating Classified Ad {Id}";
             }

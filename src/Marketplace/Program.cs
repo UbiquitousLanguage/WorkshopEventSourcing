@@ -13,8 +13,7 @@ namespace Marketplace
 {
     public static class Program
     {
-        static Program() =>
-            CurrentDirectory = Path.GetDirectoryName(GetEntryAssembly().Location);
+        static Program() => CurrentDirectory = Path.GetDirectoryName(GetEntryAssembly().Location);
 
         static async Task<int> Main(string[] args)
         {

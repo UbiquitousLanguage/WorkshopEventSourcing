@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Marketplace.Contracts;
 using Marketplace.Domain.ClassifiedAds;
+using Marketplace.Domain.Shared.Services.ContentModeration;
 using Marketplace.Framework;
 using Serilog;
 
@@ -10,15 +11,21 @@ namespace Marketplace
     public class ClassifiedAdsApplicationService
     {
         private readonly IAggregateStore _store;
+        private readonly Func<DateTimeOffset> _getUtcNow;
+        private readonly CheckTextForProfanity _checkTextForProfanity;
 
-        public ClassifiedAdsApplicationService(IAggregateStore store) => _store = store;
+        public ClassifiedAdsApplicationService(IAggregateStore store, Func<DateTimeOffset> getUtcNow, CheckTextForProfanity checkTextForProfanity)
+        {
+            _store = store;
+            _getUtcNow = getUtcNow;
+            _checkTextForProfanity = checkTextForProfanity;
+        }
 
-        public Task Handle(ClassifiedAds.V1.Create command) =>
+        public Task Handle(ClassifiedAds.V1.CreateAd command) =>
             _store.Save(ClassifiedAd.Create(
                 command.Id,
                 command.OwnerId,
-                command.CreatedBy,
-                command.CreatedAt));
+                _getUtcNow));
 
         public Task Handle(ClassifiedAds.V1.RenameAd command) =>
             HandleUpdate(command.Id, ad =>
@@ -27,7 +34,7 @@ namespace Marketplace
 
         public Task Handle(ClassifiedAds.V1.UpdateText command) =>
             HandleUpdate(command.Id, ad =>
-                ad.UpdateText(command.Text, command.TextChangedAt, command.TextChangedBy)
+                ad.UpdateText(command.Text, command.TextChangedAt, command.TextChangedBy, _checkTextForProfanity)
             );
 
         public Task Handle(ClassifiedAds.V1.ChangePrice command) =>

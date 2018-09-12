@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Marketplace.Domain.Shared.Services.ContentModeration;
 using Marketplace.Framework;
 
 namespace Marketplace.Domain.ClassifiedAds
@@ -44,15 +46,15 @@ namespace Marketplace.Domain.ClassifiedAds
             }
         }
 
-        public static ClassifiedAd Create(ClassifiedAdId id, UserId owner, UserId createdBy, DateTimeOffset createdAt)
+        public static ClassifiedAd Create(ClassifiedAdId id, UserId owner, Func<DateTimeOffset> getUtcNow)
         {
             var ad = new ClassifiedAd();
             ad.Apply(new Events.V1.ClassifiedAdCreated
             {
                 Id = id,
                 Owner = owner,
-                CreatedBy = createdBy,
-                CreatedAt = createdAt
+                CreatedBy = owner,
+                CreatedAt = getUtcNow()
             });
             return ad;
         }
@@ -72,7 +74,12 @@ namespace Marketplace.Domain.ClassifiedAds
             });
         }
 
-        public void UpdateText(AdText text, DateTimeOffset updatedAt, UserId updatedBy) =>
+        public async Task UpdateText(AdText text, DateTimeOffset updatedAt, UserId updatedBy, CheckTextForProfanity checkTextForProfanity)
+        {
+            var containsProfanity = await checkTextForProfanity(text);
+            if (containsProfanity)
+                throw new Exceptions.ProfanityFound();   
+            
             Apply(new Events.V1.ClassifiedAdTextUpdated
             {
                 Id = Id,
@@ -81,6 +88,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 TextUpdatedAt = updatedAt,
                 TextUpdatedBy = updatedBy
             });
+        }
 
         public void ChangePrice(Price price, DateTimeOffset changedAt, UserId changedBy) =>
             Apply(new Events.V1.ClassifiedAdPriceChanged

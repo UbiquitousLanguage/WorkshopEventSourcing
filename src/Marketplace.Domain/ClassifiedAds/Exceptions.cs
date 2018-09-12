@@ -17,5 +17,7 @@ namespace Marketplace.Domain.ClassifiedAds
         {
             public ClassifiedAdActivationException(string message) : base(message) { }
         }
+        
+        public class ProfanityFound : Exception{ }
     }
 }
