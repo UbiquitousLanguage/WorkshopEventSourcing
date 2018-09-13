@@ -43,7 +43,7 @@ namespace Marketplace.Modules.ClassifiedAds.Projections
                         break;
                     
                     case Events.V1.ClassifiedAdPriceChanged x:
-                        await session.UpdateOrThrow<ClassifiedAdsByOwnerDocument>(DocumentId(x.Owner),
+                        await session.UpdateIfFound<ClassifiedAdsByOwnerDocument>(DocumentId(x.Owner),
                             r =>
                             {
                                 var ad = r.ListOfAds.First(a => a.Id == x.Id);
@@ -52,7 +52,7 @@ namespace Marketplace.Modules.ClassifiedAds.Projections
                         break;
                     
                     case Events.V1.ClassifiedAdRenamed x:
-                        await session.UpdateOrThrow<ClassifiedAdsByOwnerDocument>(DocumentId(x.Owner),
+                        await session.UpdateIfFound<ClassifiedAdsByOwnerDocument>(DocumentId(x.Owner),
                             r =>
                             {
                                 var ad = r.ListOfAds.First(a => a.Id == x.Id);

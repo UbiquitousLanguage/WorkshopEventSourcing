@@ -56,6 +56,7 @@ namespace Marketplace
             var typeMapper = new TypeMapper()
                 .Map<Events.V1.ClassifiedAdCreated>("ClassifiedAdCreated")
                 .Map<Events.V1.ClassifiedAdRenamed>("ClassifiedAdRenamed")
+                .Map<Events.V1.ClassifiedAdTextUpdated>("ClassifiedAdTextUpdated")
                 .Map<Events.V1.ClassifiedAdPriceChanged>("ClassifiedAdPriceChanged")
                 .Map<Events.V1.ClassifiedAdActivated>("ClassifiedAdActivated")
                 .Map<Events.V1.ClassifiedAdDeactivated>("ClassifiedAdDeactivated")
