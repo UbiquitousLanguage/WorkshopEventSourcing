@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Marketplace.Domain.ClassifiedAds;
+using Marketplace.Modules.ClassifiedAds;
 using Xunit.Abstractions;
 using static Marketplace.Contracts.ClassifiedAds.V1;
 
@@ -16,7 +17,9 @@ namespace Marketplace.Tests
         public readonly Fixture AutoFixture = new Fixture();
 
         public override Func<RenameAd, Task> GetHandler(SpecificationAggregateStore store)
-            => cmd => new ClassifiedAdsApplicationService(store).Handle(cmd);
+            => cmd => new ClassifiedAdsApplicationService(store: store, 
+                getUtcNow: () => DateTimeOffset.MinValue, 
+                checkTextForProfanity: _ => Task.FromResult(false)).Handle(cmd);
 
         private Guid ClassifiedAdId { get; } = Guid.NewGuid();
         private Guid Owner          { get; } = Guid.NewGuid();
@@ -41,7 +44,7 @@ namespace Marketplace.Tests
                     Title     = Command.Title,
                     Owner     = Owner,
                     RenamedBy = Command.RenamedBy,
-                    RenamedAt = Command.RenamedAt
+                    RenamedAt = DateTimeOffset.MinValue
                 });
     }
 }
