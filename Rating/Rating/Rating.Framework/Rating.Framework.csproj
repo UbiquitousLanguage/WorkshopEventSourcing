@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <LangVersion>7.1</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.1.0.23" />
+        <PackageReference Include="LibLog" Version="5.0.2" />
+        <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+        <PackageReference Include="RavenDB.Client" Version="4.0.3" />
+    </ItemGroup>
+</Project>
