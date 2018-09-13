@@ -12,7 +12,9 @@ namespace Marketplace.Modules.ClassifiedAds
         private readonly Func<DateTimeOffset> _getUtcNow;
         private readonly CheckTextForProfanity _checkTextForProfanity;
 
-        public ClassifiedAdsApplicationService(IAggregateStore store, Func<DateTimeOffset> getUtcNow, CheckTextForProfanity checkTextForProfanity)
+        public ClassifiedAdsApplicationService(IAggregateStore store,
+            Func<DateTimeOffset> getUtcNow,
+            CheckTextForProfanity checkTextForProfanity)
         {
             _store = store;
             _getUtcNow = getUtcNow;
