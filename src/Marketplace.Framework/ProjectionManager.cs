@@ -60,17 +60,22 @@ namespace Marketplace.Framework
                 if (e.OriginalEvent.EventType.StartsWith("$")) return;
 
                 // get the configured clr type name for deserializing the event
-                var eventType = _typeMapper.GetType(e.Event.EventType);
-
-                // deserialize event
-                var domainEvent = _serializer.Deserialize(e.Event.Data, eventType);
+                if (!_typeMapper.TryGetType(e.Event.EventType, out var eventType))
+                {
+                    Log.Trace("Failed to find name mapped with {eventType}. Skipping...", e.Event.EventType);
+                }
+                else
+                {
+                    // deserialize event
+                    var domainEvent = _serializer.Deserialize(e.Event.Data, eventType);
                 
-                // try to execute the projection
-                await projection.Handle(domainEvent);
+                    // try to execute the projection
+                    await projection.Handle(domainEvent);
 
-                // log
-                Log.Debug("{event} projected into {projection}", domainEvent, projection);
-                
+                    // log
+                    Log.Debug("{event} projected into {projection}", domainEvent, projection);
+                }
+
                 // store the current checkpoint
                 await _checkpointStore.SetCheckpoint(e.OriginalPosition.Value, projection);
             };
