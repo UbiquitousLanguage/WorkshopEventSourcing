@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
 using EventStore.ClientAPI.SystemData;
-using Marketplace.Framework.Logging;
+using Marketplace.Framework;
 using static System.String;
 
-namespace Marketplace.Framework
+namespace Marketplace.Infrastructure.EventStore
 {
     public class GesAggregateStore : IAggregateStore
     {
         private const int MaxReadSize = 4096;
 
-        private static readonly ILog Log = LogProvider.For<GesAggregateStore>();
+        private static readonly Serilog.ILogger Log = Serilog.Log.ForContext<GesAggregateStore>();
         
         private readonly IEventStoreConnection _connection;
         private readonly GetStreamName _getStreamName;
@@ -90,7 +90,7 @@ namespace Marketplace.Framework
 
             if (!changes.Any())
             {
-                Log.Warn("{Id} v{Version} aggregate has no changes.", aggregate.Id, aggregate.Version);
+                Log.Information("{Id} v{Version} aggregate has no changes.", aggregate.Id, aggregate.Version);
                 return default;
             }
 
@@ -112,7 +112,7 @@ namespace Marketplace.Framework
             Log.Debug("Saved {count} {aggregate} change(s) into stream {streamName}", changes.Length, aggregate, stream);
 
             foreach (var change in aggregate.GetChanges())
-                Log.Info(change.ToString);
+                Log.Information(change.ToString());
 
             return (
                 result.NextExpectedVersion,

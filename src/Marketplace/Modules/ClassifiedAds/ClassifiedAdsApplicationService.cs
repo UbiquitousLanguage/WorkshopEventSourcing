@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Marketplace.Domain.ClassifiedAds;
-using Marketplace.Domain.Shared.Services.ContentModeration;
+using Marketplace.Domain.Shared.Services;
 using Marketplace.Framework;
+using static Marketplace.Contracts.ClassifiedAds;
 
 namespace Marketplace.Modules.ClassifiedAds
 {
@@ -19,71 +20,44 @@ namespace Marketplace.Modules.ClassifiedAds
             _checkTextForProfanity = checkTextForProfanity;
         }
 
-        public Task Handle(Contracts.ClassifiedAds.V1.CreateAd command) =>
-            _store.Save(ClassifiedAd.Create(command.Id, command.OwnerId, _getUtcNow));
-
-        public Task Handle(Contracts.ClassifiedAds.V1.RenameAd command) =>
-            HandleUpdate(command.Id, ad =>
-                ad.Rename(command.Title, command.RenamedBy, _getUtcNow)
-            );
-
-        public Task Handle(Contracts.ClassifiedAds.V1.UpdateText command) =>
-            HandleUpdate(command.Id, ad =>
-                ad.UpdateText(command.Text, command.TextChangedBy, _getUtcNow, _checkTextForProfanity)
-            );
-
-        public Task Handle(Contracts.ClassifiedAds.V1.ChangePrice command) =>
-            HandleUpdate(command.Id, ad =>
-                ad.ChangePrice(command.Price, command.PriceChangedBy, _getUtcNow)
-            );
-
-        public Task Handle(Contracts.ClassifiedAds.V1.Publish command) =>
-            HandleUpdate(command.Id, ad =>
-                ad.Publish(command.PublishedBy, _getUtcNow)
-            );
-
-        public Task Handle(Contracts.ClassifiedAds.V1.Activate command) =>
-            HandleUpdate(command.Id, ad =>
-                ad.Activate(command.ActivatedBy, _getUtcNow)
-            );
-
-        public Task Handle(Contracts.ClassifiedAds.V1.Report command) =>
-            HandleUpdate(command.Id, ad =>
-                ad.Report(command.Reason, command.ReportedBy, _getUtcNow)
-            );
-
-        public Task Handle(Contracts.ClassifiedAds.V1.Reject command) =>
-            HandleUpdate(command.Id, ad =>
-                ad.Reject(command.Reason, command.RejectedBy, _getUtcNow)
-            );
-
-        public Task Handle(Contracts.ClassifiedAds.V1.Deactivate command) =>
-            HandleUpdate(command.Id, ad =>
-                ad.Deactivate(command.DeactivatedBy, _getUtcNow)
-            );
-
-        public Task Handle(Contracts.ClassifiedAds.V1.MarkAsSold command) =>
-            HandleUpdate(command.Id, ad =>
-                ad.MarkAsSold(command.MarkedBy, _getUtcNow)
-            );
-
-        public Task Handle(Contracts.ClassifiedAds.V1.Remove command) =>
-            HandleUpdate(command.Id, ad =>
-                ad.Remove(command.RemovedBy, _getUtcNow)
-            );
-
-        private async Task HandleUpdate(Guid id, Action<ClassifiedAd> update)
+        public Task Handle<T>(T cmd) where T : class
         {
-            var ad = await _store.Load<ClassifiedAd>(id.ToString());
-            update(ad);
-            await _store.Save(ad);
+            switch (cmd)
+            {
+                 case V1.RegisterAd x:
+                     return _store.Save(ClassifiedAd.Register(x.Id, x.OwnerId, _getUtcNow));
+
+                 case V1.ChangeTitle x: 
+                     return Execute(x.ClassifiedAdId, ad => ad.ChangeTitle(x.Title, _getUtcNow));
+                     
+                 case V1.ChangeText x: 
+                     return Execute(x.ClassifiedAdId, ad => ad.ChangeText(x.Text, _getUtcNow, _checkTextForProfanity));
+
+                 case V1.ChangePrice x: 
+                     return Execute(x.ClassifiedAdId, ad => ad.ChangePrice(x.Price, _getUtcNow));
+                     
+                 case V1.Publish x: 
+                     return Execute(x.ClassifiedAdId, ad => ad.Publish(_getUtcNow));
+                 
+                 case V1.MarkAsSold x: 
+                     return Execute(x.ClassifiedAdId, ad => ad.MarkAsSold(_getUtcNow));
+                 
+                 case V1.Remove x: 
+                     return Execute(x.ClassifiedAdId, ad => ad.Remove(_getUtcNow));
+                 
+                 default:
+                     return Task.CompletedTask;
+            }
         }
         
-        private async Task HandleUpdate(Guid id, Func<ClassifiedAd, Task> update)
+        private async Task Execute(Guid id, Func<ClassifiedAd, Task> update)
         {
             var ad = await _store.Load<ClassifiedAd>(id.ToString());
             await update(ad);
             await _store.Save(ad);
         }
+        
+        private Task Execute(Guid id, Action<ClassifiedAd> update) 
+            => Execute(id, ad => { update(ad); return Task.CompletedTask; });
     }
 }

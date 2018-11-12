@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Marketplace.Domain.ClassifiedAds;
 using Microsoft.AspNetCore.Mvc;
+using static Marketplace.Contracts.ClassifiedAds;
 
 namespace Marketplace.Modules.ClassifiedAds
 {
@@ -10,83 +10,42 @@ namespace Marketplace.Modules.ClassifiedAds
     {
         private static readonly Serilog.ILogger Log = Serilog.Log.ForContext<ClassifiedAdsCommandsApi>();
 
-        private readonly ClassifiedAdsApplicationService _appService;
+        private readonly ClassifiedAdsApplicationService _service;
 
-        public ClassifiedAdsCommandsApi(ClassifiedAdsApplicationService appService) => _appService = appService;
+        public ClassifiedAdsCommandsApi(ClassifiedAdsApplicationService service) => _service = service;
 
-        /// <summary>
-        ///     Create a new classified ad
-        /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Post(Contracts.ClassifiedAds.V1.CreateAd request)
-        {
-            Log.Information(request.ToString());
-            await _appService.Handle(request);
-            return Ok();
-        }
+        public Task<IActionResult> When(V1.RegisterAd cmd) => Handle(cmd);
 
-        /// <summary>
-        ///    Rename a classified ad
-        /// </summary>
-        [Route("name")]
-        [HttpPut]
-        public Task<IActionResult> Put(Contracts.ClassifiedAds.V1.RenameAd request) =>
-            HandleOrThrow(request, x => _appService.Handle(x));
+        [HttpPut, Route("name")]
+        public Task<IActionResult> When(V1.ChangeTitle cmd) => Handle(cmd);
 
-        [Route("text")]
-        [HttpPut]
-        public Task<IActionResult> Put(Contracts.ClassifiedAds.V1.UpdateText request) =>
-            HandleOrThrow(request, _appService.Handle);
+        [HttpPut, Route("text")]
+        public Task<IActionResult> When(V1.ChangeText cmd) => Handle(cmd);
 
-        [Route("price")]
-        [HttpPut]
-        public Task<IActionResult> Put(Contracts.ClassifiedAds.V1.ChangePrice request) =>
-            HandleOrThrow(request, x => _appService.Handle(x));
+        [HttpPut, Route("price")]
+        public Task<IActionResult> When(V1.ChangePrice cmd) => Handle(cmd);
 
-        [Route("publish")]
-        [HttpPut]
-        public Task<IActionResult> Put(Contracts.ClassifiedAds.V1.Publish request) =>
-            HandleOrThrow(request, x => _appService.Handle(x));
+        [HttpPut, Route("publish")]
+        public Task<IActionResult> When(V1.Publish cmd) => Handle(cmd);
 
-        [Route("activate")]
-        [HttpPut]
-        public Task<IActionResult> Put(Contracts.ClassifiedAds.V1.Activate request) =>
-            HandleOrThrow(request, x => _appService.Handle(x));
-
-        [Route("deactivate")]
-        [HttpPut]
-        public Task<IActionResult> Put(Contracts.ClassifiedAds.V1.Deactivate request) =>
-            HandleOrThrow(request, x => _appService.Handle(x));
-
-        [Route("report")]
-        [HttpPut]
-        public Task<IActionResult> Put(Contracts.ClassifiedAds.V1.Report request) =>
-            HandleOrThrow(request, x => _appService.Handle(x));
-
-        [Route("reject")]
-        [HttpPut]
-        public Task<IActionResult> Put(Contracts.ClassifiedAds.V1.Reject request) =>
-            HandleOrThrow(request, x => _appService.Handle(x));
-
-        [Route("marksold")]
-        [HttpPut]
-        public Task<IActionResult> Put(Contracts.ClassifiedAds.V1.MarkAsSold request) =>
-            HandleOrThrow(request, x => _appService.Handle(x));
+        [HttpPut, Route("mark-sold")]
+        public Task<IActionResult> When(V1.MarkAsSold cmd) => Handle(cmd);
 
         [HttpDelete]
-        public Task<IActionResult> Put(Contracts.ClassifiedAds.V1.Remove request) =>
-            HandleOrThrow(request, x => _appService.Handle(x));
+        public Task<IActionResult> When(V1.Remove cmd) => Handle(cmd);
 
-        private async Task<IActionResult> HandleOrThrow<T>(T request, Func<T, Task> handler)
+        private async Task<IActionResult> Handle<T>(T cmd) where T : class
         {
             try
             {
-                Log.Information(request.ToString());
-                await handler(request);
+                Log.Information(cmd.ToString());
+                await _service.Handle(cmd);
                 return Ok();
             }
-            catch (Exceptions.ClassifiedAdNotFoundException)
+            catch (Exceptions.ClassifiedAdNotFoundException ex)
             {
+                Log.Debug(ex.ToString());
                 return NotFound();
             }
         }

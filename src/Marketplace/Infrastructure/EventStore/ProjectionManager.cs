@@ -2,14 +2,16 @@
 using System.Linq;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
-using Marketplace.Framework.Logging;
+using Marketplace.Framework;
+using Serilog.Events;
 
-namespace Marketplace.Framework
+namespace Marketplace.Infrastructure.EventStore
 {
     public class ProjectionManager
     {
         public static readonly ProjectionManagerBuilder With = new ProjectionManagerBuilder();
-        private static readonly ILog Log = LogProvider.For<ProjectionManager>();
+        
+        private static readonly Serilog.ILogger Log = Serilog.Log.ForContext<ProjectionManager>();
         
         private readonly ICheckpointStore _checkpointStore;
         private readonly IEventStoreConnection _connection;
@@ -41,7 +43,7 @@ namespace Marketplace.Framework
             var settings = new CatchUpSubscriptionSettings(
                 _maxLiveQueueSize,
                 _readBatchSize,
-                Log.IsTraceEnabled(),
+                Log.IsEnabled(LogEventLevel.Verbose),
                 false,
                 projection);
 
@@ -62,7 +64,7 @@ namespace Marketplace.Framework
                 // get the configured clr type name for deserializing the event
                 if (!_typeMapper.TryGetType(e.Event.EventType, out var eventType))
                 {
-                    Log.Trace("Failed to find name mapped with {eventType}. Skipping...", e.Event.EventType);
+                    Log.Verbose("Failed to find name mapped with {eventType}. Skipping...", e.Event.EventType);
                 }
                 else
                 {
@@ -100,14 +102,14 @@ namespace Marketplace.Framework
                     case SubscriptionDropReason.CatchUpError:
                     case SubscriptionDropReason.ProcessingQueueOverflow:
                     case SubscriptionDropReason.EventHandlerException:
-                        Log.ErrorException(
+                        Log.Error(
                             "{projection} projection stopped because of a transient error ({reason}). " +
                             "Attempting to restart...",
                             ex, projection, reason);
                         Task.Run(() => StartProjection(projection));
                         break;
                     default:
-                        Log.FatalException(
+                        Log.Fatal(
                             "{projection} projection stopped because of an internal error ({reason}). " +
                             "Please check your logs for details.",
                             ex, projection, reason);

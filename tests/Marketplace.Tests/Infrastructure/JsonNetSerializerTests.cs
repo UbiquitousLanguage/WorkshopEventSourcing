@@ -1,9 +1,10 @@
 using System;
 using AutoFixture;
 using FluentAssertions;
+using Marketplace.Infrastructure.JsonNet;
 using Xunit;
 
-namespace Marketplace.Framework.Tests
+namespace Marketplace.Tests.Infrastructure
 {
     public class JsonNetSerializerTests
     {

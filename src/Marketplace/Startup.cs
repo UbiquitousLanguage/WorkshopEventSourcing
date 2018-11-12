@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
+ using Marketplace.Infrastructure.EventStore;
+ using Marketplace.Infrastructure.JsonNet;
  using Marketplace.Infrastructure.Purgomalum;
+ using Marketplace.Infrastructure.RavenDB;
  using Marketplace.Modules.ClassifiedAds;
  using Marketplace.Modules.ClassifiedAds.Projections;
  using Marketplace.Projections;
@@ -54,14 +57,12 @@ namespace Marketplace
             var serializer = new JsonNetSerializer();
 
             var typeMapper = new TypeMapper()
-                .Map<Events.V1.ClassifiedAdCreated>("ClassifiedAdCreated")
-                .Map<Events.V1.ClassifiedAdRenamed>("ClassifiedAdRenamed")
-                .Map<Events.V1.ClassifiedAdTextUpdated>("ClassifiedAdTextUpdated")
-                .Map<Events.V1.ClassifiedAdPriceChanged>("ClassifiedAdPriceChanged")
-                .Map<Events.V1.ClassifiedAdActivated>("ClassifiedAdActivated")
-                .Map<Events.V1.ClassifiedAdDeactivated>("ClassifiedAdDeactivated")
-                .Map<Events.V1.ClassifiedAdPublished>("ClassifiedAdPublished")
-                .Map<Events.V1.ClassifiedAdMarkedAsSold>("ClassifiedAdMarkedAsSold");
+                .Map<Events.V1.ClassifiedAdRegistered>("Marketplace.V1.ClassifiedAdRegistered")
+                .Map<Events.V1.ClassifiedAdTitleChanged>("Marketplace.V1.ClassifiedAdTitleChanged")
+                .Map<Events.V1.ClassifiedAdTextChanged>("Marketplace.V1.ClassifiedAdTextUpdated")
+                .Map<Events.V1.ClassifiedAdPriceChanged>("Marketplace.V1.ClassifiedAdPriceChanged")
+                .Map<Events.V1.ClassifiedAdPublished>("Marketplace.V1.ClassifiedAdPublished")
+                .Map<Events.V1.ClassifiedAdSold>("Marketplace.V1.ClassifiedAdMarkedAsSold");
             
             var aggregateStore = new GesAggregateStore(
                 (type, id) => $"{type.Name}-{id}",
@@ -84,8 +85,8 @@ namespace Marketplace
                 .TypeMapper(typeMapper)
                 .CheckpointStore(new RavenCheckpointStore(GetSession))
                 .Projections(
-                    new ClassifiedAdsByOwner(GetSession),
-                    new ActiveClassifiedAds(GetSession))
+                    new ClassifiedAdsByOwnerProjection(GetSession),
+                    new AvailableClassifiedAdsProjection(GetSession))
                 .Activate();
             
             services.AddMvc();

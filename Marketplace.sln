@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Framework", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Tests", "tests\Marketplace.Tests\Marketplace.Tests.csproj", "{67629E9E-9CF8-4536-83D3-CBBCFDCD5BE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Framework.Tests", "tests\Marketplace.Framework.Tests\Marketplace.Framework.Tests.csproj", "{4C813AC9-F1E9-4118-A924-F792A42ABB72}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,9 +30,5 @@ Global
 		{67629E9E-9CF8-4536-83D3-CBBCFDCD5BE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67629E9E-9CF8-4536-83D3-CBBCFDCD5BE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67629E9E-9CF8-4536-83D3-CBBCFDCD5BE8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4C813AC9-F1E9-4118-A924-F792A42ABB72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4C813AC9-F1E9-4118-A924-F792A42ABB72}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4C813AC9-F1E9-4118-A924-F792A42ABB72}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4C813AC9-F1E9-4118-A924-F792A42ABB72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

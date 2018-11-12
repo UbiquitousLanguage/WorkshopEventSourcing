@@ -1,212 +1,156 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Marketplace.Domain.Shared.Services.ContentModeration;
+using Marketplace.Domain.Shared.Services;
 using Marketplace.Framework;
 
 namespace Marketplace.Domain.ClassifiedAds
 {
     public class ClassifiedAd : Aggregate
     {
-        private bool _isPublished;
-        private bool _sold;
-        private Title _title;
-        private AdText _text;
-        private Price _price;
-        private Guid _owner;
-
+        private bool IsPublished { get; set; }
+        private bool WasSold { get; set; }
+        private bool WasRemoved { get; set; }
+        private Title Title { get; set; }
+        private AdText Text { get; set; }
+        private Price Price { get; set; }
+        private Guid Owner { get; set; }
+        
         protected override void When(object e)
         {
             switch (e)
             {
-                case Events.V1.ClassifiedAdCreated x:
-                    Id = x.Id;
-                    _title = new Title(x.Title);
-                    _owner = x.Owner;
+                case Events.V1.ClassifiedAdRegistered x:
+                    Id = x.ClassifiedAdId;
+                    Title = new Title(x.Title);
+                    Owner = x.Owner;
                     break;
 
-                case Events.V1.ClassifiedAdRenamed x:
-                    _title = x.Title;
+                case Events.V1.ClassifiedAdTitleChanged x:
+                    Title = new Title(x.Title);
                     break;
 
-                case Events.V1.ClassifiedAdTextUpdated x:
-                    _text = x.AdText;
+                case Events.V1.ClassifiedAdTextChanged x:
+                    Text = new AdText(x.Text);
                     break;
 
                 case Events.V1.ClassifiedAdPriceChanged x:
-                    _price = x.Price;
+                    Price = new Price(x.Price);
                     break;
 
                 case Events.V1.ClassifiedAdPublished x:
-                    _isPublished = true;
+                    IsPublished = true;
                     break;
 
-                case Events.V1.ClassifiedAdMarkedAsSold x:
-                    _sold = true;
+                case Events.V1.ClassifiedAdSold x:
+                    WasSold = true;
                     break;
             }
         }
 
-        public static ClassifiedAd Create(ClassifiedAdId id, UserId owner, Func<DateTimeOffset> getUtcNow)
+        public static ClassifiedAd Register(ClassifiedAdId id, UserId owner, Func<DateTimeOffset> getUtcNow)
         {
             var ad = new ClassifiedAd();
-            ad.Apply(new Events.V1.ClassifiedAdCreated
+            ad.Apply(new Events.V1.ClassifiedAdRegistered
             {
-                Id = id,
+                ClassifiedAdId = id,
                 Owner = owner,
-                CreatedBy = owner,
-                CreatedAt = getUtcNow()
+                RegisteredAt = getUtcNow()
             });
             return ad;
         }
 
-        public void Rename(Title title, UserId renamedBy, Func<DateTimeOffset> getUtcNow)
+        public void ChangeTitle(Title title, Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();       
+                throw new Exceptions.ClassifiedAdNotFoundException();
+
+            if (Title != Title.Default && Title == title) return;
             
-            Apply(new Events.V1.ClassifiedAdRenamed
+            Apply(new Events.V1.ClassifiedAdTitleChanged
             {
-                Id = Id,
-                Owner = _owner,
+                ClassifiedAdId = Id,
+                Owner = Owner,
                 Title = title,
-                RenamedBy = renamedBy,
-                RenamedAt = getUtcNow()
+                ChangedAt = getUtcNow()
             });
         }
 
-        public async Task UpdateText(AdText text, UserId updatedBy, Func<DateTimeOffset> getUtcNow, CheckTextForProfanity checkTextForProfanity)
+        public async Task ChangeText(AdText text, Func<DateTimeOffset> getUtcNow, CheckTextForProfanity checkTextForProfanity)
         {
             if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();      
+                throw new Exceptions.ClassifiedAdNotFoundException(); 
+            
+            if (Text != AdText.Default && Text == text) return;
             
             var containsProfanity = await checkTextForProfanity(text);
             if (containsProfanity)
                 throw new Exceptions.ProfanityFound();   
             
-            Apply(new Events.V1.ClassifiedAdTextUpdated
+            Apply(new Events.V1.ClassifiedAdTextChanged
             {
-                Id = Id,
-                Owner = _owner,
-                AdText = text,
-                TextUpdatedBy = updatedBy,
-                TextUpdatedAt = getUtcNow()
+                ClassifiedAdId = Id,
+                Owner = Owner,
+                Text = text,
+                ChangedAt = getUtcNow()
             });
         }
 
-        public void ChangePrice(Price price, UserId changedBy, Func<DateTimeOffset> getUtcNow)
+        public void ChangePrice(Price price, Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();      
+                throw new Exceptions.ClassifiedAdNotFoundException();   
+            
+            if (Price != Price.Default && Price == price) return;
             
             Apply(new Events.V1.ClassifiedAdPriceChanged
             {
-                Id = Id,
-                Owner = _owner,
+                ClassifiedAdId = Id,
+                Owner = Owner,
                 Price = price,
-                PriceChangedBy = changedBy,
-                PriceChangedAt = getUtcNow()
+                ChangedAt = getUtcNow()
             });
         }
 
-        public void Publish(UserId publishedBy, Func<DateTimeOffset> getUtcNow)
+        public void Publish(Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();      
+                throw new Exceptions.ClassifiedAdNotFoundException();
+
+            if (IsPublished) return;
             
             Apply(new Events.V1.ClassifiedAdPublished
             {
-                Id = Id,
-                Title = _title,
-                Text = _text,
-                PublishedBy = publishedBy,
+                ClassifiedAdId = Id,
+                Title = Title,
+                Text = Text,
                 PublishedAt = getUtcNow()
             });
         }
 
-        public void Activate(UserId activatedBy, Func<DateTimeOffset> getUtcNow)
+        public void MarkAsSold(Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
                 throw new Exceptions.ClassifiedAdNotFoundException();      
             
-            if (_price == null)
-                throw new Exceptions.ClassifiedAdActivationException("Price should be specified");
+            if (WasSold) return;
             
-            if (string.IsNullOrEmpty(_title))
-                throw new Exceptions.ClassifiedAdActivationException("Title cannot be empty");
-                
-            Apply(new Events.V1.ClassifiedAdActivated
+            Apply(new Events.V1.ClassifiedAdSold
             {
-                Id = Id,
-                Title = _title,
-                Price = _price,
-                ActivatedBy = activatedBy,
-                ActivatedAt = getUtcNow()
+                ClassifiedAdId = Id,
+                SoldAt = getUtcNow()
             });
         }
 
-        public void Reject(string reason, UserId rejectedBy, Func<DateTimeOffset> getUtcNow)
+        public void Remove(Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();      
-            
-            Apply(new Events.V1.ClassifiedAdRejected
-            {
-                Id = Id,
-                Reason = reason,
-                RejectedBy = rejectedBy,
-                RejectedAt = getUtcNow()
-            });
-        }
+                throw new Exceptions.ClassifiedAdNotFoundException();
 
-        public void Report(string reason, UserId reportedBy, Func<DateTimeOffset> getUtcNow)
-        {
-            if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();      
-            
-            Apply(new Events.V1.ClassifiedAdReportedByUser
-            {
-                Id = Id,
-                Reason = reason,
-                ReportedBy = reportedBy,
-                ReportedAt = getUtcNow()
-            });
-        }
-
-        public void MarkAsSold(UserId markedBy, Func<DateTimeOffset> getUtcNow)
-        {
-            if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();      
-            
-            Apply(new Events.V1.ClassifiedAdMarkedAsSold
-            {
-                Id = Id,
-                MarkedAsSoldBy = markedBy,
-                MarkedAsSoldAt = getUtcNow()
-            });
-        }
-
-        public void Deactivate(UserId deactivatedBy, Func<DateTimeOffset> getUtcNow)
-        {
-            if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();      
-            
-            Apply(new Events.V1.ClassifiedAdDeactivated
-            {
-                Id = Id,
-                DeactivatedBy = deactivatedBy,
-                DeactivatedAt = getUtcNow()
-            });
-        }
-
-        public void Remove(UserId removedBy, Func<DateTimeOffset> getUtcNow)
-        {
-            if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();      
+            if (WasRemoved) return;
             
             Apply(new Events.V1.ClassifiedAdRemoved
             {
-                Id = Id,
-                RemovedBy = removedBy,
+                ClassifiedAdId = Id,
                 RemovedAt = getUtcNow()
             });
         }

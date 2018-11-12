@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Text;
+using Marketplace.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Marketplace.Framework
+namespace Marketplace.Infrastructure.JsonNet
 {
     public class JsonNetSerializer : ISerializer
     {

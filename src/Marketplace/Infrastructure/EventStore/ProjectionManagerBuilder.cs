@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
 using EventStore.ClientAPI;
+using Marketplace.Framework;
 
-namespace Marketplace.Framework
+namespace Marketplace.Infrastructure.EventStore
 {
     public class ProjectionManagerBuilder
     {

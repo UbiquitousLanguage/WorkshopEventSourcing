@@ -6,10 +6,7 @@ namespace Marketplace.Domain.ClassifiedAds
     {
         public readonly string Value;
 
-        public Email(string value)
-        {
-            Value = value;
-        }
+        public Email(string value) => Value = value;
 
         public static implicit operator string(Email self) => self.Value;
 
