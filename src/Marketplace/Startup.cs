@@ -1,17 +1,16 @@
 ﻿﻿using System;
- using System.Net.Http;
- using System.Reflection;
+using System.Reflection;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
+using FluentValidation.AspNetCore;
 using Marketplace.Domain.ClassifiedAds;
 using Marketplace.Framework;
- using Marketplace.Infrastructure.EventStore;
- using Marketplace.Infrastructure.JsonNet;
- using Marketplace.Infrastructure.Purgomalum;
- using Marketplace.Infrastructure.RavenDB;
- using Marketplace.Modules.ClassifiedAds;
- using Marketplace.Modules.ClassifiedAds.Projections;
- using Marketplace.Projections;
+using Marketplace.Infrastructure.EventStore;
+using Marketplace.Infrastructure.JsonNet;
+using Marketplace.Infrastructure.Purgomalum;
+using Marketplace.Infrastructure.RavenDB;
+using Marketplace.Modules.ClassifiedAds;
+using Marketplace.Modules.ClassifiedAds.Projections;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -89,7 +88,12 @@ namespace Marketplace
                     new AvailableClassifiedAdsProjection(GetSession))
                 .Activate();
             
-            services.AddMvc();
+            services.AddMvc().AddFluentValidation(x =>
+            {
+                x.RegisterValidatorsFromAssemblyContaining<Startup>();
+                x.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+            });
+            
             services.AddSwaggerGen(c =>
             {
                 c.IncludeXmlComments($"{CurrentDirectory}/Marketplace.xml");
@@ -102,8 +106,13 @@ namespace Marketplace
             });
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment environment)
         {
+            if (environment.IsDevelopment())
+            {  
+                app.UseDeveloperExceptionPage();
+            }
+            
             app.UseMvcWithDefaultRoute();
             app.UseSwagger();
             app.UseSwaggerUI(options => options.SwaggerEndpoint(
@@ -119,7 +128,12 @@ namespace Marketplace
             };
 
             if (Environment.IsDevelopment()) store.OnBeforeQuery += (_, args) 
-                => args.QueryCustomization.WaitForNonStaleResults();
+                => args.QueryCustomization
+                    .WaitForNonStaleResults()
+                    .AfterQueryExecuted(result =>
+                    {
+                        Log.Debug("{index} took {duration}", result.IndexName, result.DurationInMs);
+                    });
             
             try 
             {

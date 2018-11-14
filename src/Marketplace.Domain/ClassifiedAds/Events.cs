@@ -14,7 +14,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 public Guid Owner { get; set; }
                 
                 public override string ToString() 
-                    => $"Classified Ad {ClassifiedAdId} registered.";      
+                    => $"Classified Ad '{ClassifiedAdId}' registered.";      
             }
 
             public class ClassifiedAdTitleChanged
@@ -25,7 +25,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 public DateTimeOffset ChangedAt { get; set; }
                 
                 public override string ToString() 
-                    => $"Classified Ad title {ClassifiedAdId} changed to '{(Title?.Length > 25 ? $"{Title?.Substring(0, 22)}..." : Title )}'";
+                    => $"Classified Ad '{ClassifiedAdId}' title changed.";
             }
             
             public class ClassifiedAdTextChanged
@@ -34,6 +34,9 @@ namespace Marketplace.Domain.ClassifiedAds
                 public string Text { get; set; }
                 public DateTimeOffset ChangedAt { get; set; }
                 public Guid Owner { get; set; }
+                
+                public override string ToString() 
+                    => $"Classified Ad '{ClassifiedAdId}' text changed."; 
             }
 
             public class ClassifiedAdPriceChanged
@@ -42,6 +45,9 @@ namespace Marketplace.Domain.ClassifiedAds
                 public double Price { get; set; }
                 public DateTimeOffset ChangedAt { get; set; }
                 public Guid Owner { get; set; }
+                
+                public override string ToString() 
+                    => $"Classified Ad '{ClassifiedAdId}' price changed."; 
             }
             
             public class ClassifiedAdPublished
@@ -51,14 +57,19 @@ namespace Marketplace.Domain.ClassifiedAds
                 public string Text { get; set; }
                 public DateTimeOffset PublishedAt { get; set; }
                 public Guid Owner { get; set; }
+                
+                public override string ToString() 
+                    => $"Classified Ad '{ClassifiedAdId}' published."; 
             }
-            
-           
+                       
             public class ClassifiedAdSold
             {
                 public Guid ClassifiedAdId { get; set; }
                 public DateTimeOffset SoldAt { get; set; }
                 public Guid Owner { get; set; }
+                
+                public override string ToString() 
+                    => $"Classified Ad '{ClassifiedAdId}' sold."; 
             }
 
             public class ClassifiedAdRemoved
@@ -66,6 +77,9 @@ namespace Marketplace.Domain.ClassifiedAds
                 public Guid ClassifiedAdId { get; set; }
                 public DateTimeOffset RemovedAt { get; set; }
                 public Guid Owner { get; set; }
+                
+                public override string ToString() 
+                    => $"Classified Ad '{ClassifiedAdId}' removed."; 
             }
         }
     }

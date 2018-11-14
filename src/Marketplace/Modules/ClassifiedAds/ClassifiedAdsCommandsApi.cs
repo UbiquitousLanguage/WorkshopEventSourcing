@@ -1,39 +1,40 @@
 ﻿using System.Threading.Tasks;
 using Marketplace.Domain.ClassifiedAds;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using static Marketplace.Contracts.ClassifiedAds;
 
 namespace Marketplace.Modules.ClassifiedAds
 {
-    [Route("/ad")]
+    [Route("/ads")]
     public class ClassifiedAdsCommandsApi : Controller
     {
-        private static readonly Serilog.ILogger Log = Serilog.Log.ForContext<ClassifiedAdsCommandsApi>();
+        private static readonly ILogger Log = Serilog.Log.ForContext<ClassifiedAdsCommandsApi>();
 
         private readonly ClassifiedAdsApplicationService _service;
 
         public ClassifiedAdsCommandsApi(ClassifiedAdsApplicationService service) => _service = service;
 
-        [HttpPost]
-        public Task<IActionResult> When(V1.RegisterAd cmd) => Handle(cmd);
+        [HttpPost, Route("register")]
+        public Task<IActionResult> When([FromBody] V1.Register cmd) => Handle(cmd);
 
-        [HttpPut, Route("name")]
-        public Task<IActionResult> When(V1.ChangeTitle cmd) => Handle(cmd);
+        [HttpPost, Route("change-title")]
+        public Task<IActionResult> When([FromBody] V1.ChangeTitle cmd) => Handle(cmd);
 
-        [HttpPut, Route("text")]
-        public Task<IActionResult> When(V1.ChangeText cmd) => Handle(cmd);
+        [HttpPost, Route("change-text")]
+        public Task<IActionResult> When([FromBody] V1.ChangeText cmd) => Handle(cmd);
 
-        [HttpPut, Route("price")]
-        public Task<IActionResult> When(V1.ChangePrice cmd) => Handle(cmd);
+        [HttpPost, Route("change-price")]
+        public Task<IActionResult> When([FromBody] V1.ChangePrice cmd) => Handle(cmd);
 
-        [HttpPut, Route("publish")]
-        public Task<IActionResult> When(V1.Publish cmd) => Handle(cmd);
+        [HttpPost, Route("publish")]
+        public Task<IActionResult> When([FromBody] V1.Publish cmd) => Handle(cmd);
 
-        [HttpPut, Route("mark-sold")]
-        public Task<IActionResult> When(V1.MarkAsSold cmd) => Handle(cmd);
+        [HttpPost, Route("mark-as-sold")]
+        public Task<IActionResult> When([FromBody] V1.MarkAsSold cmd) => Handle(cmd);
 
-        [HttpDelete]
-        public Task<IActionResult> When(V1.Remove cmd) => Handle(cmd);
+        [HttpPost, Route("remove")]
+        public Task<IActionResult> When([FromBody] V1.Remove cmd) => Handle(cmd);
 
         private async Task<IActionResult> Handle<T>(T cmd) where T : class
         {
@@ -43,7 +44,7 @@ namespace Marketplace.Modules.ClassifiedAds
                 await _service.Handle(cmd);
                 return Ok();
             }
-            catch (Exceptions.ClassifiedAdNotFoundException ex)
+            catch (ClassifiedAdNotFound ex)
             {
                 Log.Debug(ex.ToString());
                 return NotFound();

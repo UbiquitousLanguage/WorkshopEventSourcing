@@ -24,14 +24,19 @@ namespace Marketplace.Modules.ClassifiedAds
         {
             switch (cmd)
             {
-                 case V1.RegisterAd x:
-                     return _store.Save(ClassifiedAd.Register(x.Id, x.OwnerId, _getUtcNow));
+                 case V1.Register x:
+                     return _store.Save(ClassifiedAd.Register(x.ClassifiedAdId, x.OwnerId, _getUtcNow));
 
                  case V1.ChangeTitle x: 
                      return Execute(x.ClassifiedAdId, ad => ad.ChangeTitle(x.Title, _getUtcNow));
                      
                  case V1.ChangeText x: 
-                     return Execute(x.ClassifiedAdId, ad => ad.ChangeText(x.Text, _getUtcNow, _checkTextForProfanity));
+                     return Execute(x.ClassifiedAdId, async ad =>
+                     {
+                         var text = await AdText.Parse(x.Text, _checkTextForProfanity);
+                         
+                         ad.ChangeText(text, _getUtcNow, _checkTextForProfanity);
+                     });
 
                  case V1.ChangePrice x: 
                      return Execute(x.ClassifiedAdId, ad => ad.ChangePrice(x.Price, _getUtcNow));

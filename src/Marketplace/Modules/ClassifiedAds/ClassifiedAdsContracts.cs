@@ -4,16 +4,16 @@ using System;
 
 namespace Marketplace.Contracts
 {
-    public static class ClassifiedAds
+    public static partial class ClassifiedAds
     {
-        public static class V1
+        public static partial class V1
         {
-            public class RegisterAd
+            public class Register
             {
-                public Guid Id { get; set; }
+                public Guid ClassifiedAdId { get; set; }
                 public Guid OwnerId { get; set; }
 
-                public override string ToString() => $"Registering new classified ad {Id}...";
+                public override string ToString() => $"Registering Classified ad '{ClassifiedAdId}'...";
             }
 
             public class ChangeTitle
@@ -22,35 +22,49 @@ namespace Marketplace.Contracts
                 public string Title { get; set; }
                 
                 public override string ToString() 
-                    => $"Renaming Classified Ad {ClassifiedAdId} to '{(Title?.Length > 25 ? $"{Title.Substring(0, 22)}..." : Title )}'";
+                    => $"Changing title of Classified Ad '{ClassifiedAdId}'...";
             }
 
             public class ChangeText
             {
                 public Guid ClassifiedAdId { get; set; }
                 public string Text { get; set; }
-                public Guid TextChangedBy { get; set; }
+                
+                public override string ToString() 
+                    => $"Changing text of Classified Ad '{ClassifiedAdId}'...";
             }
 
             public class ChangePrice
             {
                 public Guid ClassifiedAdId { get; set; }
                 public double Price { get; set; }
+                
+                public override string ToString() 
+                    => $"Changing price of Classified Ad '{ClassifiedAdId}'...";
             }
 
             public class Publish
             {
                 public Guid ClassifiedAdId { get; set; }
+                
+                public override string ToString() 
+                    => $"Publishing Classified Ad '{ClassifiedAdId}'...";
             }
 
             public class MarkAsSold
             {
                 public Guid ClassifiedAdId { get; set; }
+                
+                public override string ToString() 
+                    => $"Marking as sold Classified Ad '{ClassifiedAdId}'...";
             }
 
             public class Remove
             {
                 public Guid ClassifiedAdId { get; set; }
+                
+                public override string ToString() 
+                    => $"Removing Classified Ad '{ClassifiedAdId}'...";
             }
 
             public class GetAvailableAds

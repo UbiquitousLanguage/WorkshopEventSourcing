@@ -17,7 +17,7 @@ namespace Marketplace.Infrastructure.RavenDB
                     throw new ReadModelNotFoundException(typeof(T).Name, documentId);
                 
                 doc = new T();
-                await session.StoreAsync(doc);
+                await session.StoreAsync(doc, documentId);
             }
             
             update(doc);

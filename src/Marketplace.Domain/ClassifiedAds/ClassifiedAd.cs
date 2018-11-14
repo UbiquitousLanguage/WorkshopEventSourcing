@@ -22,7 +22,7 @@ namespace Marketplace.Domain.ClassifiedAds
                 case Events.V1.ClassifiedAdRegistered x:
                     Id = x.ClassifiedAdId;
                     Title = new Title(x.Title);
-                    Owner = x.Owner;
+                    Owner = new OwnerId(x.Owner);
                     break;
 
                 case Events.V1.ClassifiedAdTitleChanged x:
@@ -47,7 +47,7 @@ namespace Marketplace.Domain.ClassifiedAds
             }
         }
 
-        public static ClassifiedAd Register(ClassifiedAdId id, UserId owner, Func<DateTimeOffset> getUtcNow)
+        public static ClassifiedAd Register(ClassifiedAdId id, OwnerId owner, Func<DateTimeOffset> getUtcNow)
         {
             var ad = new ClassifiedAd();
             ad.Apply(new Events.V1.ClassifiedAdRegistered
@@ -62,7 +62,7 @@ namespace Marketplace.Domain.ClassifiedAds
         public void ChangeTitle(Title title, Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();
+                throw new ClassifiedAdNotFound();
 
             if (Title != Title.Default && Title == title) return;
             
@@ -75,16 +75,12 @@ namespace Marketplace.Domain.ClassifiedAds
             });
         }
 
-        public async Task ChangeText(AdText text, Func<DateTimeOffset> getUtcNow, CheckTextForProfanity checkTextForProfanity)
+        public void ChangeText(AdText text, Func<DateTimeOffset> getUtcNow, CheckTextForProfanity checkTextForProfanity)
         {
             if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException(); 
+                throw new ClassifiedAdNotFound();
             
-            if (Text != AdText.Default && Text == text) return;
-            
-            var containsProfanity = await checkTextForProfanity(text);
-            if (containsProfanity)
-                throw new Exceptions.ProfanityFound();   
+            if (Text != AdText.Default && Text == text) return;  
             
             Apply(new Events.V1.ClassifiedAdTextChanged
             {
@@ -98,7 +94,7 @@ namespace Marketplace.Domain.ClassifiedAds
         public void ChangePrice(Price price, Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();   
+                throw new ClassifiedAdNotFound();  
             
             if (Price != Price.Default && Price == price) return;
             
@@ -114,7 +110,7 @@ namespace Marketplace.Domain.ClassifiedAds
         public void Publish(Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();
+                throw new ClassifiedAdNotFound();
 
             if (IsPublished) return;
             
@@ -130,7 +126,7 @@ namespace Marketplace.Domain.ClassifiedAds
         public void MarkAsSold(Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();      
+                throw new ClassifiedAdNotFound();     
             
             if (WasSold) return;
             
@@ -144,7 +140,7 @@ namespace Marketplace.Domain.ClassifiedAds
         public void Remove(Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
-                throw new Exceptions.ClassifiedAdNotFoundException();
+                throw new ClassifiedAdNotFound();
 
             if (WasRemoved) return;
             

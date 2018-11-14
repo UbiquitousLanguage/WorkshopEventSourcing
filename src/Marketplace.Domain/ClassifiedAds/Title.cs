@@ -8,7 +8,7 @@ namespace Marketplace.Domain.ClassifiedAds
     {
         public static readonly Title Default = new Title(Empty);
 
-        private readonly string Value;
+        public readonly string Value;
         
         internal Title(string value) => Value = value;
 

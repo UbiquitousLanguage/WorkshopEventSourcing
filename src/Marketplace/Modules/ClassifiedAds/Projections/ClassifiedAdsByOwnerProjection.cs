@@ -30,6 +30,7 @@ namespace Marketplace.Modules.ClassifiedAds.Projections
                                 Status = ClassifiedAdStatus.Registered
                             });
                         });
+
                     case V1.ClassifiedAdPriceChanged x:
                         return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
                         {

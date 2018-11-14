@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Raven.Client.Documents.Session;
+using Serilog;
 using static Marketplace.Contracts.ClassifiedAds;
 
 namespace Marketplace.Modules.ClassifiedAds
@@ -9,7 +10,7 @@ namespace Marketplace.Modules.ClassifiedAds
     [Route("/ad")]
     public class ClassifiedAdsQueriesApi : Controller
     {
-        private static readonly Serilog.ILogger Log = Serilog.Log.ForContext<ClassifiedAdsQueriesApi>();
+        private static readonly ILogger Log = Serilog.Log.ForContext<ClassifiedAdsQueriesApi>();
 
         private Func<IAsyncDocumentSession> GetSession { get; }
 

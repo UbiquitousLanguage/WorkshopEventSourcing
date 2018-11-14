@@ -1,4 +1,6 @@
-﻿using Marketplace.Framework;
+﻿using System.Threading.Tasks;
+using Marketplace.Domain.Shared.Services;
+using Marketplace.Framework;
 using static System.String;
 
 namespace Marketplace.Domain.ClassifiedAds
@@ -7,11 +9,19 @@ namespace Marketplace.Domain.ClassifiedAds
     {
         public static readonly AdText Default = new AdText(Empty);
         
-        public readonly string Value;
-
         internal AdText(string value) => Value = value;
         
+        public readonly string Value;
+        
+        public static async Task<AdText> Parse(string text, CheckTextForProfanity checkTextForProfanity)
+        {
+            var containsProfanity = await checkTextForProfanity(text);
+            if (containsProfanity)
+                throw new ProfanityFound();   
+            
+            return new AdText(text);
+        }
+        
         public static implicit operator string(AdText self) => self.Value;
-        public static implicit operator AdText(string value) => new AdText(value);
     }
 }

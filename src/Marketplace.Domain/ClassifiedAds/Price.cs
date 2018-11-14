@@ -1,24 +1,25 @@
-﻿using Marketplace.Framework;
+﻿using System;
+using Marketplace.Framework;
 
 namespace Marketplace.Domain.ClassifiedAds
 {
     public class Price : Value<Price>
     {
-        public readonly Price Default = new Price(0);
+        public static readonly Price Default = new Price(0);
 
-        private readonly double _value;
+        public readonly double Value;
 
-        internal Price(double value) => _value = value;
+        internal Price(double value) => Value = value;
 
         public static Price Parse(double value)
         {
-            if (value <= 0d)
-                throw new Exceptions.PriceNotAllowed();
+            if (value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(value), "Price cannot be negative.");
 
             return new Price(value);
         }
 
-        public static implicit operator double(Price self) => self._value;
+        public static implicit operator double(Price self) => self.Value;
         public static implicit operator Price(double value) => Parse(value);
     }
 }

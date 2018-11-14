@@ -1,23 +1,35 @@
 ﻿using System;
 
 namespace Marketplace.Domain.ClassifiedAds
-{
-    public class Exceptions
+{  
+    public class PriceNotAllowed : DomainException 
     {
-        public class PriceNotAllowed : Exception{ }
+        public PriceNotAllowed() 
+            : base("Price not allowed.") { }
+    }
 
-        public class ClassifiedAdNotFoundException : Exception
-        {
-            public ClassifiedAdNotFoundException() { }
-
-            public ClassifiedAdNotFoundException(Guid id) : base($"Classified ad with id '{id}' was not found") { }
-        }
-
-        public class ClassifiedAdActivationException : Exception
-        {
-            public ClassifiedAdActivationException(string message) : base(message) { }
-        }
+    public class TitleTooLong : DomainException 
+    {
+        public TitleTooLong() 
+            : base("Title too long.") { }
+    }
+    
+    public class ClassifiedAdNotFound : DomainException 
+    {
+        public ClassifiedAdNotFound() 
+            : base("Classified ad not found.") { }
+    }
+    
+    public class ProfanityFound : DomainException 
+    {
+        public ProfanityFound() 
+            : base("Profanity found.") { }
+    }
+    
+    public abstract class DomainException : Exception
+    {
+        protected DomainException(string message) : base(message) { }
         
-        public class ProfanityFound : Exception{ }
+        public Guid Id { get; } = Guid.NewGuid();
     }
 }
