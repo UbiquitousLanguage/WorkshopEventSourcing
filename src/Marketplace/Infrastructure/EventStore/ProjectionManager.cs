@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using Marketplace.Framework;
@@ -64,7 +65,7 @@ namespace Marketplace.Infrastructure.EventStore
                 // get the configured clr type name for deserializing the event
                 if (!_typeMapper.TryGetType(e.Event.EventType, out var eventType))
                 {
-                    Log.Verbose("Failed to find name mapped with {eventType}. Skipping...", e.Event.EventType);
+                    Log.Verbose("Failed to find clr type for {eventType}. Skipping...", e.Event.EventType);
                 }
                 else
                 {
@@ -75,7 +76,7 @@ namespace Marketplace.Infrastructure.EventStore
                     await projection.Handle(domainEvent);
 
                     // log
-                    Log.Debug("{event} projected into {projection}", domainEvent, projection);
+                    Log.Debug("{projection} handled {event}", projection, domainEvent);
                 }
 
                 // store the current checkpoint
@@ -106,6 +107,7 @@ namespace Marketplace.Infrastructure.EventStore
                             "{projection} projection stopped because of a transient error ({reason}). " +
                             "Attempting to restart...",
                             ex, projection, reason);
+                        Thread.Sleep(TimeSpan.FromSeconds(1));
                         Task.Run(() => StartProjection(projection));
                         break;
                     default:

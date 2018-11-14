@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Marketplace.Framework;
 
 namespace Marketplace.Domain.ClassifiedAds
 {  
@@ -24,12 +24,5 @@ namespace Marketplace.Domain.ClassifiedAds
     {
         public ProfanityFound() 
             : base("Profanity found.") { }
-    }
-    
-    public abstract class DomainException : Exception
-    {
-        protected DomainException(string message) : base(message) { }
-        
-        public Guid Id { get; } = Guid.NewGuid();
     }
 }
