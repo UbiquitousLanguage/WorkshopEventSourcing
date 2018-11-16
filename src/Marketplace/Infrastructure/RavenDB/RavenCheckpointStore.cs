@@ -19,8 +19,7 @@ namespace Marketplace.Infrastructure.RavenDB
 
             using (var session = _getSession())
             {
-                var doc = await session.LoadAsync<CheckpointDocument>(GetCheckpointDocumentId(projection))
-                    .ConfigureAwait(false);
+                var doc = await session.LoadAsync<CheckpointDocument>(GetCheckpointDocumentId(projection));
 
                 if (doc != null)
                 {
@@ -41,21 +40,21 @@ namespace Marketplace.Infrastructure.RavenDB
             using (var session = _getSession())
             {
                 var id = GetCheckpointDocumentId(projection);
-                var doc = await session.LoadAsync<CheckpointDocument>(id).ConfigureAwait(false);
+                var doc = await session.LoadAsync<CheckpointDocument>(id);
 
                 if (doc != null)
                     doc.Checkpoint = checkpoint;
                 else
-                    await session.StoreAsync(new CheckpointDocument { Checkpoint = checkpoint }, id).ConfigureAwait(false);
+                    await session.StoreAsync(new CheckpointDocument { Checkpoint = checkpoint }, id);
 
-                await session.SaveChangesAsync().ConfigureAwait(false);
+                await session.SaveChangesAsync();
 
                 Log.Debug("{projection} checkpoint set to {checkpoint}", projection, checkpoint);
             }
         }
 
         static string GetCheckpointDocumentId(string projection) =>
-            $"checkpoints/{projection.ToLowerInvariant()}";
+            $"Checkpoints/{projection.ToLowerInvariant()}";
 
         class CheckpointDocument
         {

@@ -13,42 +13,46 @@ namespace Marketplace.Modules.ClassifiedAds.Projections
 
         public AvailableClassifiedAdsProjection(Func<IAsyncDocumentSession> getSession) => GetSession = getSession;
 
-        public override Task Handle(object e)
+        public override async Task Handle(object e)
         {
             switch (e)
             {
                 case V1.ClassifiedAdRegistered x:
-                    return GetSession.ThenSave<AvailableClassifiedAd>(
+                    await GetSession.ThenSave<AvailableClassifiedAd>(
                         AvailableClassifiedAd.Id(x.ClassifiedAdId), doc =>
                         {
                             doc.Owner = x.Owner;
                             doc.ClassifiedAdId = x.ClassifiedAdId;
                         });
+                    break;
 
                 case V1.ClassifiedAdTitleChanged x:
-                    return GetSession.ThenSave<AvailableClassifiedAd>(
+                    await GetSession.ThenSave<AvailableClassifiedAd>(
                         AvailableClassifiedAd.Id(x.ClassifiedAdId), doc => doc.Title = x.Title);
+                    break;
 
                 case V1.ClassifiedAdTextChanged x:
-                    return GetSession.ThenSave<AvailableClassifiedAd>(
+                    await GetSession.ThenSave<AvailableClassifiedAd>(
                         AvailableClassifiedAd.Id(x.ClassifiedAdId), doc => doc.Text = x.Text);
+                    break;
 
                 case V1.ClassifiedAdPriceChanged x:
-                    return GetSession.ThenSave<AvailableClassifiedAd>(
+                    await GetSession.ThenSave<AvailableClassifiedAd>(
                         AvailableClassifiedAd.Id(x.ClassifiedAdId), doc => doc.Price = x.Price);
+                    break;
 
                 case V1.ClassifiedAdPublished x:
-                    return GetSession.ThenSave<AvailableClassifiedAd>(
+                    await GetSession.ThenSave<AvailableClassifiedAd>(
                         AvailableClassifiedAd.Id(x.ClassifiedAdId), doc => doc.PublishedAt = x.PublishedAt);
+                    break;
 
                 case V1.ClassifiedAdSold x:
-                    return GetSession.ThenDelete(AvailableClassifiedAd.Id(x.ClassifiedAdId));
+                    await GetSession.ThenDelete(AvailableClassifiedAd.Id(x.ClassifiedAdId));
+                    break;
 
                 case V1.ClassifiedAdRemoved x:
-                    return GetSession.ThenDelete(AvailableClassifiedAd.Id(x.ClassifiedAdId));
-
-                default:
-                    return Task.CompletedTask;
+                    await GetSession.ThenDelete(AvailableClassifiedAd.Id(x.ClassifiedAdId));
+                    break;
             }
         }
 

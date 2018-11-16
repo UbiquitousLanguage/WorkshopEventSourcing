@@ -35,13 +35,18 @@ namespace Marketplace.Infrastructure.EventStore
             _readBatchSize = readBatchSize ?? 500;
         }
 
-        public Task Activate() => Task.WhenAll(_projections.Select(StartProjection));
+        public async Task Activate()
+        {
+            foreach (var projection in _projections)
+            {
+                await StartProjection(projection);
+            }
+            //return Task.WhenAll(_projections.Select(StartProjection));
+        }
 
         async Task StartProjection(Projection projection)
         {
-            var lastCheckpoint = await _checkpointStore
-                .GetLastCheckpoint<Position>(projection)
-                .ConfigureAwait(false);
+            var lastCheckpoint = await _checkpointStore.GetLastCheckpoint<Position>(projection);
 
             var settings = new CatchUpSubscriptionSettings(
                 _maxLiveQueueSize,
@@ -67,7 +72,7 @@ namespace Marketplace.Infrastructure.EventStore
                 // get the configured clr type name for deserializing the event
                 if (!_typeMapper.TryGetType(e.Event.EventType, out var eventType))
                 {
-                    Log.Verbose("Failed to find clr type for {eventType}. Skipping...", e.Event.EventType);
+                    Log.Debug("Failed to find clr type for {eventType}. Skipping...", e.Event.EventType);
                 }
                 else
                 {
@@ -77,26 +82,13 @@ namespace Marketplace.Infrastructure.EventStore
                     // try to execute the projection
                     if (projection.CanHandle(domainEvent))
                     {
-                        try
-                        {
-                            await projection
-                                .Handle(domainEvent)
-                                .ConfigureAwait(false);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Fatal("{projection} failed to handle {event}: {message}", ex, projection, domainEvent);
-                            throw;
-                        }
-
+                        await projection.Handle(domainEvent);
                         Log.Debug("{projection} handled {event}", projection, domainEvent);
                     }
                 }
 
                 // store the current checkpoint
-                await _checkpointStore
-                    .SetCheckpoint(e.OriginalPosition.Value, projection)
-                    .ConfigureAwait(false);
+                await _checkpointStore.SetCheckpoint(e.OriginalPosition, projection);
             };
 
         Action<EventStoreCatchUpSubscription, SubscriptionDropReason, Exception>SubscriptionDropped(Projection projection)

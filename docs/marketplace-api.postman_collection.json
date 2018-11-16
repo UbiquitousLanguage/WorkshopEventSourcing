@@ -41,69 +41,61 @@
 									]
 								}
 							},
-							"response": []
-						},
-						{
-							"name": "Remove",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\"\n}"
-								},
-								"url": {
-									"raw": "http://localhost:5000/ads/remove",
-									"protocol": "http",
-									"host": [
-										"localhost"
+							"response": [
+								{
+									"name": "Register new classified ad",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\",\n\t\"ownerId\": \"14547BB5-374E-4737-841A-BAE7E98085A2\"\n}"
+										},
+										"url": {
+											"raw": "http://localhost:5000/ads/register",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"ads",
+												"register"
+											]
+										}
+									},
+									"status": "Unprocessable Entity",
+									"code": 422,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Wed, 14 Nov 2018 15:36:46 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Server",
+											"value": "Kestrel"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										}
 									],
-									"port": "5000",
-									"path": [
-										"ads",
-										"remove"
-									]
+									"cookie": [],
+									"body": "{\n    \"Key\": \"WrongExpectedStreamVersion\",\n    \"Message\": \"Failed to append stream ClassifiedAd-51bbaf48-fb7a-427e-a7b6-56f6a99c1cc7 with expected version -1. Current Version: 1\"\n}"
 								}
-							},
-							"response": []
-						},
-						{
-							"name": "Mark as Sold",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\"\n}"
-								},
-								"url": {
-									"raw": "http://localhost:5000/ads/mark-as-sold",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "5000",
-									"path": [
-										"ads",
-										"mark-as-sold"
-									]
-								}
-							},
-							"response": []
+							]
 						},
 						{
 							"name": "Change Title",
@@ -119,7 +111,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\",\n\t\"title\": \"PS4 + Destiny 2 + Horizon Zero Dawn\"\n}"
+									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\",\n\t\"title\": \"PS4 + Destiny 2 + Horizon Zero Dawn + Fifa 19 + Doom\"\n}"
 								},
 								"url": {
 									"raw": "http://localhost:5000/ads/change-title",
@@ -150,7 +142,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\",\n\t\"text\": \"PS4 with two games in mint condition: Destiny 2 and Horizon Zero Dawn.\"\n}"
+									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\",\n\t\"text\": \"PS4 with three games in mint condition: Destiny 2, Fifa 19 and Horizon Zero Dawn.\"\n}"
 								},
 								"url": {
 									"raw": "http://localhost:5000/ads/change-text",
@@ -296,6 +288,99 @@
 									"body": null
 								}
 							]
+						},
+						{
+							"name": "Mark as Sold",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5000/ads/mark-as-sold",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"ads",
+										"mark-as-sold"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Publish",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5000/ads/publish",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"ads",
+										"publish"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5000/ads/remove",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"ads",
+										"remove"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"event": [
@@ -326,7 +411,7 @@
 					"name": "Queries",
 					"item": [
 						{
-							"name": "Classified Ads by Owner",
+							"name": "Available Classified Ads",
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -335,20 +420,15 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "http://localhost:5000/ads?OwnerId=34587E17-1534-42ED-89E1-EA251D294A5E",
+									"raw": "http://localhost:5000/ads/available",
 									"protocol": "http",
 									"host": [
 										"localhost"
 									],
 									"port": "5000",
 									"path": [
-										"ads"
-									],
-									"query": [
-										{
-											"key": "OwnerId",
-											"value": "34587E17-1534-42ED-89E1-EA251D294A5E"
-										}
+										"ads",
+										"available"
 									]
 								}
 							},

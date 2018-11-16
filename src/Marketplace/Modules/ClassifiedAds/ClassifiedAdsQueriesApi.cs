@@ -21,10 +21,6 @@ namespace Marketplace.Modules.ClassifiedAds
         public Task<IActionResult> When([FromQuery] V1.GetAvailableAds qry)
             => RunQuery(qry, () => Service.GetAvailableAds(qry, HttpContext.RequestAborted));
 
-        [HttpGet, Route("by-owner")]
-        public Task<IActionResult> When([FromQuery] V1.GetAdsByOwner qry)
-            => RunQuery(qry, () => Service.GetAdsByOwner(qry, HttpContext.RequestAborted));
-
         async Task<IActionResult> RunQuery<T, TResult>(T query, Func<Task<TResult>> runQuery)
         {
             Log.Information(query.ToString());

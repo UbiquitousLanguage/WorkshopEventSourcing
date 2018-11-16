@@ -9,7 +9,7 @@ namespace Marketplace.Infrastructure.RavenDB
     {
         public static async Task Save<T>(this IAsyncDocumentSession session, string documentId, Action<T> update, bool throwOnNotFound = false) where T : new()
         {
-            var doc = await session.LoadAsync<T>(documentId).ConfigureAwait(false);
+            var doc = await session.LoadAsync<T>(documentId);
 
             if (doc == null)
             {
@@ -17,19 +17,19 @@ namespace Marketplace.Infrastructure.RavenDB
                     throw new ReadModelNotFoundException(typeof(T).Name, documentId);
 
                 doc = new T();
-                await session.StoreAsync(doc, documentId).ConfigureAwait(false);
+                await session.StoreAsync(doc, documentId);
             }
 
             update(doc);
 
-            await session.SaveChangesAsync().ConfigureAwait(false);
+            await session.SaveChangesAsync();
         }
 
         public static async Task ThenSave<T>(this Func<IAsyncDocumentSession> getSession, string documentId, Action<T> action, bool throwOnNotFound = false) where T : new()
         {
             using (var session = getSession())
             {
-                await session.Save(documentId, action, throwOnNotFound).ConfigureAwait(false);
+                await session.Save(documentId, action, throwOnNotFound);
             }
         }
 
@@ -38,7 +38,7 @@ namespace Marketplace.Infrastructure.RavenDB
             using (var session = getSession())
             {
                 session.Delete(documentId);
-                await session.SaveChangesAsync().ConfigureAwait(false);
+                await session.SaveChangesAsync();
             }
         }
     }

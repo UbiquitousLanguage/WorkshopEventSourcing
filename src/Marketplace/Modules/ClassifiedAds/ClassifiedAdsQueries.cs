@@ -43,34 +43,5 @@ namespace Marketplace.Modules.ClassifiedAds
                 Items = result.ToArray()
             };
         }
-
-        public static async Task<V1.GetAdsByOwner.Result> GetAdsByOwner(
-            this IAsyncDocumentSession session, V1.GetAdsByOwner query, CancellationToken cancellationToken)
-        {
-            var doc = await session.LoadAsync<Projections.ClassifiedAdsByOwnerProjection.ClassifiedAdsByOwner>(
-                query.OwnerId.ToString(), cancellationToken);
-
-            if (doc == null)
-            {
-                return new V1.GetAdsByOwner.Result();
-            }
-
-            var items = doc.Ads
-                .Where(x => query.Status == null || x.Status.ToString() == query.Status.ToString())
-                .OrderByDescending(x => x.RegisteredAt)
-                .Select(x => new V1.GetAdsByOwner.Result.Item
-                {
-                    ClassifiedAdId = x.Id,
-                    Title = x.Title,
-                    Text = x.Text,
-                    Price = x.Price,
-                    RegisteredAt = x.RegisteredAt,
-                    PublishedAt = x.PublishedAt,
-                    SoldAt = x.SoldAt,
-                    RemovedAt = x.RemovedAt
-                }).ToArray();
-
-            return new V1.GetAdsByOwner.Result { Items = items };
-        }
     }
 }
