@@ -49,7 +49,7 @@ namespace Marketplace
             }
         }
 
-        private static IConfiguration BuildConfiguration(string[] args)
+        static IConfiguration BuildConfiguration(string[] args)
             => new ConfigurationBuilder()
                 .SetBasePath(CurrentDirectory)
                 .AddJsonFile("appsettings.json", false, false)

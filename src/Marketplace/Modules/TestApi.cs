@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marketplace
+namespace Marketplace.Modules
 {
     [Route("/test")]
     public class TestApi : Controller

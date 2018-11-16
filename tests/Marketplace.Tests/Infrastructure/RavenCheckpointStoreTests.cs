@@ -3,11 +3,12 @@ using System.Threading.Tasks;
 using AutoFixture;
 using EventStore.ClientAPI;
 using FluentAssertions;
+using Marketplace.Infrastructure.RavenDB;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 using Xunit;
 
-namespace Marketplace.Framework.Tests
+namespace Marketplace.Tests.Infrastructure
 {
     public class RavenCheckpointStoreTests : IDisposable
     {
@@ -19,14 +20,14 @@ namespace Marketplace.Framework.Tests
 
         public void Dispose() => LazyStore.Value?.Dispose();
 
-        private Func<IAsyncDocumentSession> GetDocumentSession { get; }
-        private Fixture AutoFixture { get; }
+        Func<IAsyncDocumentSession> GetDocumentSession { get; }
+        Fixture AutoFixture { get; }
 
-        private static readonly Lazy<IDocumentStore> LazyStore = new Lazy<IDocumentStore>(() =>
+        static readonly Lazy<IDocumentStore> LazyStore = new Lazy<IDocumentStore>(() =>
         {
             var store = new DocumentStore {
                 Urls     = new[] {"http://localhost:8080"},
-                Database = "ClassifiedAds"
+                Database = "Marketplace"
             };
 
             return store.Initialize();

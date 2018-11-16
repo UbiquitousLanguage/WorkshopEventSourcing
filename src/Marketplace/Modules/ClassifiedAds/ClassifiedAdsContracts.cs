@@ -4,118 +4,139 @@ using System;
 
 namespace Marketplace.Contracts
 {
-    public static class ClassifiedAds
+    public static partial class ClassifiedAds
     {
-        public static class V1
+        public static partial class V1
         {
-            /// <summary>
-            ///     Create a new ad command
-            /// </summary>
-            public class CreateAd
+            public class Register
             {
-                /// <summary>
-                ///     New ad id
-                /// </summary>
-                public Guid Id { get; set; }
-                
-                /// <summary>
-                ///     Ad owner id
-                /// </summary>
+                public Guid ClassifiedAdId { get; set; }
                 public Guid OwnerId { get; set; }
 
-                public override string ToString() => $"Creating Classified Ad {Id}";
+                public override string ToString() => $"Registering Classified ad '{ClassifiedAdId}'...";
             }
 
-            public class RenameAd
+            public class ChangeTitle
             {
-                /// <summary>
-                ///     New ad id
-                /// </summary>
-                public Guid Id { get; set; }
-
-                /// <summary>
-                ///     The new title
-                /// </summary>
+                public Guid ClassifiedAdId { get; set; }
                 public string Title { get; set; }
 
-                /// <summary>
-                ///     Id of the user who renamed the ad
-                /// </summary>
-                public Guid RenamedBy { get; set; }
-                
-                public override string ToString() 
-                    => $"Renaming Classified Ad {Id} to '{(Title?.Length > 25 ? $"{Title.Substring(0, 22)}..." : Title )}'";
+                public override string ToString()
+                    => $"Changing title of Classified Ad '{ClassifiedAdId}'...";
             }
 
-            public class UpdateText
+            public class ChangeText
             {
-                public Guid Id { get; set; }
+                public Guid ClassifiedAdId { get; set; }
                 public string Text { get; set; }
-                public Guid TextChangedBy { get; set; }
+
+                public override string ToString()
+                    => $"Changing text of Classified Ad '{ClassifiedAdId}'...";
             }
 
             public class ChangePrice
             {
-                public Guid Id { get; set; }
+                public Guid ClassifiedAdId { get; set; }
                 public double Price { get; set; }
-                public Guid PriceChangedBy { get; set; }
+
+                public override string ToString()
+                    => $"Changing price of Classified Ad '{ClassifiedAdId}'...";
             }
 
             public class Publish
             {
-                public Guid Id { get; set; }
-                public Guid PublishedBy { get; set; }
-            }
+                public Guid ClassifiedAdId { get; set; }
 
-            public class Activate
-            {
-                public Guid Id { get; set; }
-                public Guid ActivatedBy { get; set; }
-            }
-
-            public class Reject
-            {
-                public Guid Id { get; set; }
-                public string Reason { get; set; }
-                public Guid RejectedBy { get; set; }
-            }
-
-            public class Report
-            {
-                public Guid Id { get; set; }
-                public string Reason { get; set; }
-                public Guid ReportedBy { get; set; }
-            }
-
-            public class Deactivate
-            {
-                public Guid Id { get; set; }
-                public Guid DeactivatedBy { get; set; }
+                public override string ToString()
+                    => $"Publishing Classified Ad '{ClassifiedAdId}'...";
             }
 
             public class MarkAsSold
             {
-                public Guid Id { get; set; }
-                public Guid MarkedBy { get; set; }
+                public Guid ClassifiedAdId { get; set; }
+
+                public override string ToString()
+                    => $"Marking as sold Classified Ad '{ClassifiedAdId}'...";
             }
 
             public class Remove
             {
-                public Guid Id { get; set; }
-                public Guid RemovedBy { get; set; }
+                public Guid ClassifiedAdId { get; set; }
+
+                public override string ToString()
+                    => $"Removing Classified Ad '{ClassifiedAdId}'...";
+            }
+
+            public class GetAvailableAds
+            {
+                public int Page { get; set; }
+                public int PageSize { get; set; }
+
+                public class Result : Shared.V1.ItemsPage<Result.Item>
+                {
+                    public class Item
+                    {
+                        public Guid ClassifiedAdId { get; set; }
+                        public string Title { get; set; }
+                        public string Text { get; set; }
+                        public double Price { get; set; }
+                        public DateTimeOffset PublishedAt { get; set; }
+                        public Guid Owner { get; set; }
+                    }
+                }
+            }
+
+            public class GetAdsByOwner
+            {
+                public Guid OwnerId { get; set; }
+
+                public Shared.V1.ClassifiedAdStatus? Status { get; set; }
+
+                public class Result
+                {
+                    public Item[] Items { get; set; } = new Item[0];
+
+                    public class Item
+                    {
+                        public Guid ClassifiedAdId { get; set; }
+                        public string Title { get; set; }
+                        public string Text { get; set; }
+                        public double Price { get; set; }
+                        public DateTimeOffset RegisteredAt { get; set; }
+                        public DateTimeOffset? PublishedAt { get; set; }
+                        public DateTimeOffset? SoldAt { get; set; }
+                        public DateTimeOffset? RemovedAt { get; set; }
+                        public Shared.V1.ClassifiedAdStatus Status { get; set; }
+                    }
+                }
             }
         }
     }
-    
+
     public static class Shared
     {
         public static class V1
         {
-            public class Picture
+            public class ItemsPage<T>
             {
-                public string Url { get; set; }
-                public string Description { get; set; }
+                public ItemsPage() { }
+
+                public ItemsPage(int page, int pageSize, int totalPages, int totalItems, params T[] items) {
+                    Page       = page;
+                    PageSize   = pageSize;
+                    TotalPages = totalPages;
+                    TotalItems = totalItems;
+                    Items      = items;
+                }
+
+                public int Page { get; set; }
+                public int PageSize { get; set; }
+                public int TotalPages { get; set; }
+                public int TotalItems { get; set; }
+                public T[] Items { get; set; }
             }
+
+            public enum ClassifiedAdStatus { Registered, Published, Removed, Sold }
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Marketplace.Framework
 {
     public abstract class Aggregate
     {
-        private readonly IList<object> _changes = new List<object>();
+        readonly IList<object> _changes = new List<object>();
 
         public Guid Id { get; protected set; } = Guid.Empty;
         public long Version { get; private set; } = -1;
@@ -19,12 +19,12 @@ namespace Marketplace.Framework
             _changes.Add(e);
         }
 
-        public void Load(object[] history)
+        public void Load(long version, IEnumerable<object> history)
         {
+            Version = version;
             foreach (var e in history)
             {
                 When(e);
-                Version++;
             }
         }
 

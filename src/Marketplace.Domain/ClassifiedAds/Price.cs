@@ -4,18 +4,21 @@ namespace Marketplace.Domain.ClassifiedAds
 {
     public class Price : Value<Price>
     {
-        public double Value { get; }
+        public static readonly Price Default = new Price(0);
 
-        public Price(double value)
+        public readonly double Value;
+
+        internal Price(double value) => Value = value;
+
+        public static Price Parse(double value)
         {
-            if (value <= 0d)
-                throw new Exceptions.PriceNotAllowed();
-            
-            Value = value;
-        }
-        
-        public static implicit operator double(Price self) => self.Value;
+            if (value < 0)
+                throw new PriceNotAllowed();
 
-        public static implicit operator Price(double value) => new Price(value);
+            return new Price(value);
+        }
+
+        public static implicit operator double(Price self) => self.Value;
+        public static implicit operator Price(double value) => Parse(value);
     }
 }

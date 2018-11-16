@@ -1,0 +1,465 @@
+{
+	"info": {
+		"_postman_id": "718f70eb-55aa-4514-ad53-de7742a496ee",
+		"name": "Marketplace API",
+		"description": "Hands-on event sourcing with .NET Workshop showcase API.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Classified Ads",
+			"item": [
+				{
+					"name": "Commands",
+					"item": [
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\",\n\t\"ownerId\": \"14547BB5-374E-4737-841A-BAE7E98085A2\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5000/ads/register",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"ads",
+										"register"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Register new classified ad",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\",\n\t\"ownerId\": \"14547BB5-374E-4737-841A-BAE7E98085A2\"\n}"
+										},
+										"url": {
+											"raw": "http://localhost:5000/ads/register",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"ads",
+												"register"
+											]
+										}
+									},
+									"status": "Unprocessable Entity",
+									"code": 422,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Wed, 14 Nov 2018 15:36:46 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Server",
+											"value": "Kestrel"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"Key\": \"WrongExpectedStreamVersion\",\n    \"Message\": \"Failed to append stream ClassifiedAd-51bbaf48-fb7a-427e-a7b6-56f6a99c1cc7 with expected version -1. Current Version: 1\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Change Title",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\",\n\t\"title\": \"PS4 + Destiny 2 + Horizon Zero Dawn + Fifa 19 + Doom\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5000/ads/change-title",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"ads",
+										"change-title"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Text",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\",\n\t\"text\": \"PS4 with three games in mint condition: Destiny 2, Fifa 19 and Horizon Zero Dawn.\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5000/ads/change-text",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"ads",
+										"change-text"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Price",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\",\n\t\"price\": \"400\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5000/ads/change-price",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"ads",
+										"change-price"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Change Price to 420",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\",\n\t\"price\": \"400\"\n}"
+										},
+										"url": {
+											"raw": "http://localhost:5000/ads/change-price",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"ads",
+												"change-price"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "plain",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Wed, 14 Nov 2018 06:29:37 GMT"
+										},
+										{
+											"key": "Server",
+											"value": "Kestrel"
+										},
+										{
+											"key": "Content-Length",
+											"value": "0"
+										}
+									],
+									"cookie": [],
+									"body": null
+								},
+								{
+									"name": "Change Price to 400",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\",\n\t\"price\": \"400\"\n}"
+										},
+										"url": {
+											"raw": "http://localhost:5000/ads/change-price",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"ads",
+												"change-price"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "plain",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Wed, 14 Nov 2018 06:29:37 GMT"
+										},
+										{
+											"key": "Server",
+											"value": "Kestrel"
+										},
+										{
+											"key": "Content-Length",
+											"value": "0"
+										}
+									],
+									"cookie": [],
+									"body": null
+								}
+							]
+						},
+						{
+							"name": "Mark as Sold",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5000/ads/mark-as-sold",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"ads",
+										"mark-as-sold"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Publish",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5000/ads/publish",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"ads",
+										"publish"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"classifiedAdId\": \"51BBAF48-FB7A-427E-A7B6-56F6A99C1CC7\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:5000/ads/remove",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"ads",
+										"remove"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "08377380-0233-4bee-bcb4-bd7b5281d398",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "69bc15ee-4521-44ed-8752-44d406347914",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Queries",
+					"item": [
+						{
+							"name": "Available Classified Ads",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:5000/ads/available",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"ads",
+										"available"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "60bbe7f9-deb2-42a9-998a-5e75def7060d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "91911b76-e757-4ca8-87cf-a7c1c9846fd3",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

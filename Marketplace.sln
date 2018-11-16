@@ -1,14 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace", "Marketplace\Marketplace.csproj", "{666F950B-D423-4D1C-976E-D6FD7FD9C9DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace", "src\Marketplace\Marketplace.csproj", "{666F950B-D423-4D1C-976E-D6FD7FD9C9DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Domain", "Marketplace.Domain\Marketplace.Domain.csproj", "{F83409EC-7D85-47CF-9F94-7BA0A7F6929D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Domain", "src\Marketplace.Domain\Marketplace.Domain.csproj", "{F83409EC-7D85-47CF-9F94-7BA0A7F6929D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Framework", "Marketplace.Framework\Marketplace.Framework.csproj", "{51773CA3-C694-44BD-8CB4-910B3CEDBF94}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Framework", "src\Marketplace.Framework\Marketplace.Framework.csproj", "{51773CA3-C694-44BD-8CB4-910B3CEDBF94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Tests", "..\tests\Marketplace.Tests\Marketplace.Tests.csproj", "{67629E9E-9CF8-4536-83D3-CBBCFDCD5BE8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Framework.Tests", "..\tests\Marketplace.Framework.Tests\Marketplace.Framework.Tests.csproj", "{4C813AC9-F1E9-4118-A924-F792A42ABB72}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Tests", "tests\Marketplace.Tests\Marketplace.Tests.csproj", "{67629E9E-9CF8-4536-83D3-CBBCFDCD5BE8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,9 +30,5 @@ Global
 		{67629E9E-9CF8-4536-83D3-CBBCFDCD5BE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67629E9E-9CF8-4536-83D3-CBBCFDCD5BE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67629E9E-9CF8-4536-83D3-CBBCFDCD5BE8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4C813AC9-F1E9-4118-A924-F792A42ABB72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4C813AC9-F1E9-4118-A924-F792A42ABB72}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4C813AC9-F1E9-4118-A924-F792A42ABB72}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4C813AC9-F1E9-4118-A924-F792A42ABB72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

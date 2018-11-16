@@ -1,23 +1,60 @@
-﻿using System;
+﻿using Marketplace.Framework;
 
 namespace Marketplace.Domain.ClassifiedAds
 {
-    public class Exceptions
+    public class ClassifiedAdNotFound : EntityNotFoundException { }
+
+    public class ClassifiedAdAlreadyRegistered : DomainException
     {
-        public class PriceNotAllowed : Exception{ }
+        public ClassifiedAdAlreadyRegistered()
+            : base("Classified ad already registered.") { }
+    }
 
-        public class ClassifiedAdNotFoundException : Exception
-        {
-            public ClassifiedAdNotFoundException() { }
+    public class PriceNotAllowed : DomainException
+    {
+        public PriceNotAllowed()
+            : base("Price not allowed.") { }
+    }
 
-            public ClassifiedAdNotFoundException(Guid id) : base($"Classified ad with id '{id}' was not found") { }
-        }
+    public class TitleTooLong : DomainException
+    {
+        public TitleTooLong()
+            : base("Title too long.") { }
+    }
 
-        public class ClassifiedAdActivationException : Exception
-        {
-            public ClassifiedAdActivationException(string message) : base(message) { }
-        }
-        
-        public class ProfanityFound : Exception{ }
+    public class TitleRequired : DomainException
+    {
+        public TitleRequired()
+            : base("Title required.") { }
+    }
+
+    public class InvalidClassifiedAdId : DomainException
+    {
+        public InvalidClassifiedAdId()
+            : base("Id cannot be default.") { }
+    }
+
+    public class InvalidOwnerId : DomainException
+    {
+        public InvalidOwnerId()
+            : base("Id cannot be default.") { }
+    }
+
+    public class ProfanityFound : DomainException
+    {
+        public ProfanityFound()
+            : base("Profanity found.") { }
+    }
+
+    public class ClassifiedAdUnpublished : DomainException
+    {
+        public ClassifiedAdUnpublished()
+            : base("Classified ad unpublished.") { }
+    }
+
+    public class ClassifiedAdRemoved : DomainException
+    {
+        public ClassifiedAdRemoved()
+            : base("Classified ad removed.") { }
     }
 }

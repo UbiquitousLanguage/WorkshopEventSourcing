@@ -4,9 +4,12 @@ using AutoFixture;
 using EventStore.ClientAPI;
 using FluentAssertions;
 using Marketplace.Domain.ClassifiedAds;
+using Marketplace.Framework;
+using Marketplace.Infrastructure.EventStore;
+using Marketplace.Infrastructure.JsonNet;
 using Xunit;
 
-namespace Marketplace.Framework.Tests
+namespace Marketplace.Tests.Infrastructure
 {
     public class GesAggregateStoreTests
     {
@@ -17,17 +20,17 @@ namespace Marketplace.Framework.Tests
             TypeMapper = new TypeMapper();
             AutoFixture = new Fixture();
 
-            TypeMapper.Map<Events.V1.ClassifiedAdCreated>("ClassifiedAdCreated");
+            TypeMapper.Map<Events.V1.ClassifiedAdRegistered>("ClassifiedAdCreated");
             TypeMapper.Map<Events.V1.ClassifiedAdPublished>("ClassifiedAdPublished");
-            TypeMapper.Map<Events.V1.ClassifiedAdMarkedAsSold>("ClassifiedAdMarkedAsSold");
+            TypeMapper.Map<Events.V1.ClassifiedAdSold>("ClassifiedAdMarkedAsSold");
         }
 
-        private IEventStoreConnection Connection { get; }
-        private ISerializer Serializer { get; }
-        private TypeMapper TypeMapper { get; }
-        private Fixture AutoFixture { get; }
+        IEventStoreConnection Connection { get; }
+        ISerializer Serializer { get; }
+        TypeMapper TypeMapper { get; }
+        Fixture AutoFixture { get; }
 
-        private static async Task<IEventStoreConnection> GetConnection()
+        static async Task<IEventStoreConnection> GetConnection()
         {
             var connection = EventStoreConnection.Create(
                 new IPEndPoint(IPAddress.Loopback, 1113)
@@ -45,15 +48,15 @@ namespace Marketplace.Framework.Tests
         {
             var aggregate = new ClassifiedAd();
 
-            aggregate.Apply(AutoFixture.Create<Events.V1.ClassifiedAdCreated>());
+            aggregate.Apply(AutoFixture.Create<Events.V1.ClassifiedAdRegistered>());
             aggregate.Apply(AutoFixture.Create<Events.V1.ClassifiedAdPublished>());
-            aggregate.Apply(AutoFixture.Create<Events.V1.ClassifiedAdMarkedAsSold>());
+            aggregate.Apply(AutoFixture.Create<Events.V1.ClassifiedAdSold>());
 
             var sut = new GesAggregateStore((type, id) => id, Connection, Serializer, TypeMapper);
 
             var result = await sut.Save(aggregate);
 
-            // act & assert           
+            // act & assert
 
             result.NextExpectedVersion.Should().Be(2);
         }
