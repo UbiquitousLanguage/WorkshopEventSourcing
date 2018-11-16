@@ -9,9 +9,9 @@ namespace Marketplace.Modules.ClassifiedAds
     [Route("/ads")]
     public class ClassifiedAdsCommandsApi : Controller
     {
-        private static readonly ILogger Log = Serilog.Log.ForContext<ClassifiedAdsCommandsApi>();
+        static readonly ILogger Log = Serilog.Log.ForContext<ClassifiedAdsCommandsApi>();
 
-        private readonly ClassifiedAdsApplicationService _service;
+        readonly ClassifiedAdsApplicationService _service;
 
         public ClassifiedAdsCommandsApi(ClassifiedAdsApplicationService service) => _service = service;
 
@@ -36,19 +36,11 @@ namespace Marketplace.Modules.ClassifiedAds
         [HttpPost, Route("remove")]
         public Task<IActionResult> When([FromBody] V1.Remove cmd) => Handle(cmd);
 
-        private async Task<IActionResult> Handle<T>(T cmd) where T : class
+        async Task<IActionResult> Handle<T>(T cmd) where T : class
         {
-            try
-            {
-                Log.Information(cmd.ToString());
-                await _service.Handle(cmd);
-                return Ok();
-            }
-            catch (ClassifiedAdNotFound ex)
-            {
-                Log.Debug(ex.ToString());
-                return NotFound();
-            }
+            Log.Information(cmd.ToString());
+            await _service.Handle(cmd);
+            return Ok();
         }
     }
 }

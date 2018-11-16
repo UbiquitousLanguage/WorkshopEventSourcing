@@ -7,8 +7,8 @@ namespace Marketplace.Framework
 
     public class TypeMapper
     {
-        private readonly Dictionary<Type, string> _namesByType = new Dictionary<Type, string>();
-        private readonly Dictionary<string, Type> _typesByName = new Dictionary<string, Type>();
+        readonly Dictionary<Type, string> _namesByType = new Dictionary<Type, string>();
+        readonly Dictionary<string, Type> _typesByName = new Dictionary<string, Type>();
 
         public TypeMapper Map(Type type, string name = null)
         {

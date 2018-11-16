@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Marketplace.Projections;
+using Marketplace.Framework;
 using Raven.Client.Documents.Session;
 
 namespace Marketplace.Infrastructure.RavenDB
@@ -9,31 +9,36 @@ namespace Marketplace.Infrastructure.RavenDB
     {
         public static async Task Save<T>(this IAsyncDocumentSession session, string documentId, Action<T> update, bool throwOnNotFound = false) where T : new()
         {
-            var doc = await session.LoadAsync<T>(documentId);
-            
+            var doc = await session.LoadAsync<T>(documentId).ConfigureAwait(false);
+
             if (doc == null)
             {
                 if (throwOnNotFound)
                     throw new ReadModelNotFoundException(typeof(T).Name, documentId);
-                
+
                 doc = new T();
-                await session.StoreAsync(doc, documentId);
+                await session.StoreAsync(doc, documentId).ConfigureAwait(false);
             }
-            
+
             update(doc);
 
-            await session.SaveChangesAsync() ;
+            await session.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        public static Task ThenSave<T>(this Func<IAsyncDocumentSession> getSession, string documentId, Action<T> action, bool throwOnNotFound = false) where T : new() 
-            => getSession().Save(documentId, action, throwOnNotFound);
+        public static async Task ThenSave<T>(this Func<IAsyncDocumentSession> getSession, string documentId, Action<T> action, bool throwOnNotFound = false) where T : new()
+        {
+            using (var session = getSession())
+            {
+                await session.Save(documentId, action, throwOnNotFound).ConfigureAwait(false);
+            }
+        }
 
         public static async Task ThenDelete(this Func<IAsyncDocumentSession> getSession, string documentId)
         {
             using (var session = getSession())
             {
                 session.Delete(documentId);
-                await session.SaveChangesAsync();
+                await session.SaveChangesAsync().ConfigureAwait(false);
             }
         }
     }

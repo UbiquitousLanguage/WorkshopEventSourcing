@@ -5,6 +5,8 @@ namespace Marketplace.Domain.ClassifiedAds
 {
     public class OwnerId : Value<OwnerId>
     {
+        public static readonly OwnerId Default = new OwnerId(Guid.Empty);
+
         public readonly Guid Value;
 
         public OwnerId(Guid value) => Value = value;
@@ -12,7 +14,7 @@ namespace Marketplace.Domain.ClassifiedAds
         public static OwnerId Parse(Guid ownerId)
         {
             if (ownerId == Guid.Empty)
-                throw new ArgumentException("Value cannot be default.", nameof(ownerId));
+                throw new InvalidOwnerId();
 
             return new OwnerId(ownerId);
         }

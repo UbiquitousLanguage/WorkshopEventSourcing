@@ -10,9 +10,9 @@ namespace Marketplace.Tests.Infrastructure
     {
         public JsonNetSerializerTests() => AutoFixture = new Fixture();
 
-        private Fixture AutoFixture { get; }
+        Fixture AutoFixture { get; }
 
-        private class GameOver
+        class GameOver
         {
             public Guid GameId { get; set; }
             public Guid PlayerId { get; set; }
@@ -29,7 +29,7 @@ namespace Marketplace.Tests.Infrastructure
             // act
             var result = (GameOver) sut.Deserialize(sut.Serialize(expectedResult), typeof(GameOver));
 
-            //assert 
+            //assert
             result.Should().BeEquivalentTo(expectedResult);
         }
     }

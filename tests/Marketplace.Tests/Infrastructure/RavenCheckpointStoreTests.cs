@@ -20,10 +20,10 @@ namespace Marketplace.Tests.Infrastructure
 
         public void Dispose() => LazyStore.Value?.Dispose();
 
-        private Func<IAsyncDocumentSession> GetDocumentSession { get; }
-        private Fixture AutoFixture { get; }
+        Func<IAsyncDocumentSession> GetDocumentSession { get; }
+        Fixture AutoFixture { get; }
 
-        private static readonly Lazy<IDocumentStore> LazyStore = new Lazy<IDocumentStore>(() =>
+        static readonly Lazy<IDocumentStore> LazyStore = new Lazy<IDocumentStore>(() =>
         {
             var store = new DocumentStore {
                 Urls     = new[] {"http://localhost:8080"},

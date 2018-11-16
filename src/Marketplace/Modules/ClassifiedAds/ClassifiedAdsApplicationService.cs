@@ -9,11 +9,12 @@ namespace Marketplace.Modules.ClassifiedAds
 {
     public class ClassifiedAdsApplicationService
     {
-        private readonly IAggregateStore _store;
-        private readonly Func<DateTimeOffset> _getUtcNow;
-        private readonly CheckTextForProfanity _checkTextForProfanity;
+        readonly IAggregateStore _store;
+        readonly Func<DateTimeOffset> _getUtcNow;
+        readonly CheckTextForProfanity _checkTextForProfanity;
 
-        public ClassifiedAdsApplicationService(IAggregateStore store, Func<DateTimeOffset> getUtcNow, CheckTextForProfanity checkTextForProfanity)
+        public ClassifiedAdsApplicationService(
+            IAggregateStore store, Func<DateTimeOffset> getUtcNow, CheckTextForProfanity checkTextForProfanity)
         {
             _store = store;
             _getUtcNow = getUtcNow;
@@ -25,44 +26,43 @@ namespace Marketplace.Modules.ClassifiedAds
             switch (cmd)
             {
                  case V1.Register x:
-                     return _store.Save(ClassifiedAd.Register(x.ClassifiedAdId, x.OwnerId, _getUtcNow));
+                     return Execute(x.ClassifiedAdId, ad => ad.Register(x.ClassifiedAdId, x.OwnerId, _getUtcNow));
 
-                 case V1.ChangeTitle x: 
+                 case V1.ChangeTitle x:
                      return Execute(x.ClassifiedAdId, ad => ad.ChangeTitle(x.Title, _getUtcNow));
-                     
-                 case V1.ChangeText x: 
+
+                 case V1.ChangeText x:
                      return Execute(x.ClassifiedAdId, async ad =>
                      {
                          var text = await AdText.Parse(x.Text, _checkTextForProfanity);
-                         
-                         ad.ChangeText(text, _getUtcNow, _checkTextForProfanity);
+                         ad.ChangeText(text, _getUtcNow);
                      });
 
-                 case V1.ChangePrice x: 
+                 case V1.ChangePrice x:
                      return Execute(x.ClassifiedAdId, ad => ad.ChangePrice(x.Price, _getUtcNow));
-                     
-                 case V1.Publish x: 
+
+                 case V1.Publish x:
                      return Execute(x.ClassifiedAdId, ad => ad.Publish(_getUtcNow));
-                 
-                 case V1.MarkAsSold x: 
+
+                 case V1.MarkAsSold x:
                      return Execute(x.ClassifiedAdId, ad => ad.MarkAsSold(_getUtcNow));
-                 
-                 case V1.Remove x: 
+
+                 case V1.Remove x:
                      return Execute(x.ClassifiedAdId, ad => ad.Remove(_getUtcNow));
-                 
+
                  default:
                      return Task.CompletedTask;
             }
         }
-        
-        private async Task Execute(Guid id, Func<ClassifiedAd, Task> update)
+
+        async Task Execute(ClassifiedAdId id, Func<ClassifiedAd, Task> update)
         {
-            var ad = await _store.Load<ClassifiedAd>(id.ToString());
+            var ad = await _store.Load<ClassifiedAd>(id);
             await update(ad);
             await _store.Save(ad);
         }
-        
-        private Task Execute(Guid id, Action<ClassifiedAd> update) 
+
+        Task Execute(ClassifiedAdId id, Action<ClassifiedAd> update)
             => Execute(id, ad => { update(ad); return Task.CompletedTask; });
     }
 }

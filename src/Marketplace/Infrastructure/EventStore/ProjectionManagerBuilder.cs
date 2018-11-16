@@ -6,13 +6,13 @@ namespace Marketplace.Infrastructure.EventStore
 {
     public class ProjectionManagerBuilder
     {
-        private ICheckpointStore _checkpointStore;
-        private IEventStoreConnection _connection;
-        private int? _maxLiveQueueSize;
-        private Projection[] _projections;
-        private int? _readBatchSize;
-        private ISerializer _serializer;
-        private TypeMapper _typeMapper;
+        ICheckpointStore _checkpointStore;
+        IEventStoreConnection _connection;
+        int? _maxLiveQueueSize;
+        Projection[] _projections;
+        int? _readBatchSize;
+        ISerializer _serializer;
+        TypeMapper _typeMapper;
 
         public ProjectionManagerBuilder Connection(IEventStoreConnection connection)
         {

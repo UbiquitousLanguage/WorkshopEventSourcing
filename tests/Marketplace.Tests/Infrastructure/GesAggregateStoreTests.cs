@@ -25,12 +25,12 @@ namespace Marketplace.Tests.Infrastructure
             TypeMapper.Map<Events.V1.ClassifiedAdSold>("ClassifiedAdMarkedAsSold");
         }
 
-        private IEventStoreConnection Connection { get; }
-        private ISerializer Serializer { get; }
-        private TypeMapper TypeMapper { get; }
-        private Fixture AutoFixture { get; }
+        IEventStoreConnection Connection { get; }
+        ISerializer Serializer { get; }
+        TypeMapper TypeMapper { get; }
+        Fixture AutoFixture { get; }
 
-        private static async Task<IEventStoreConnection> GetConnection()
+        static async Task<IEventStoreConnection> GetConnection()
         {
             var connection = EventStoreConnection.Create(
                 new IPEndPoint(IPAddress.Loopback, 1113)
@@ -56,7 +56,7 @@ namespace Marketplace.Tests.Infrastructure
 
             var result = await sut.Save(aggregate);
 
-            // act & assert           
+            // act & assert
 
             result.NextExpectedVersion.Should().Be(2);
         }

@@ -11,16 +11,16 @@ namespace Marketplace.Infrastructure.EventStore
     public class ProjectionManager
     {
         public static readonly ProjectionManagerBuilder With = new ProjectionManagerBuilder();
-        
-        private static readonly Serilog.ILogger Log = Serilog.Log.ForContext<ProjectionManager>();
-        
-        private readonly ICheckpointStore _checkpointStore;
-        private readonly IEventStoreConnection _connection;
-        private readonly int _maxLiveQueueSize;
-        private readonly Projection[] _projections;
-        private readonly int _readBatchSize;
-        private readonly ISerializer _serializer;
-        private readonly TypeMapper _typeMapper;
+
+        static readonly Serilog.ILogger Log = Serilog.Log.ForContext<ProjectionManager>();
+
+        readonly ICheckpointStore _checkpointStore;
+        readonly IEventStoreConnection _connection;
+        readonly int _maxLiveQueueSize;
+        readonly Projection[] _projections;
+        readonly int _readBatchSize;
+        readonly ISerializer _serializer;
+        readonly TypeMapper _typeMapper;
 
         internal ProjectionManager(
             IEventStoreConnection connection, ICheckpointStore checkpointStore, ISerializer serializer,
@@ -37,9 +37,11 @@ namespace Marketplace.Infrastructure.EventStore
 
         public Task Activate() => Task.WhenAll(_projections.Select(StartProjection));
 
-        private async Task StartProjection(Projection projection)
+        async Task StartProjection(Projection projection)
         {
-            var lastCheckpoint = await _checkpointStore.GetLastCheckpoint<Position>(projection);
+            var lastCheckpoint = await _checkpointStore
+                .GetLastCheckpoint<Position>(projection)
+                .ConfigureAwait(false);
 
             var settings = new CatchUpSubscriptionSettings(
                 _maxLiveQueueSize,
@@ -56,7 +58,7 @@ namespace Marketplace.Infrastructure.EventStore
                 SubscriptionDropped(projection));
         }
 
-        private Action<EventStoreCatchUpSubscription, ResolvedEvent> EventAppeared(Projection projection) 
+        Action<EventStoreCatchUpSubscription, ResolvedEvent> EventAppeared(Projection projection)
             => async (_, e) =>
             {
                 // always double check if it is a system event ;)
@@ -71,19 +73,33 @@ namespace Marketplace.Infrastructure.EventStore
                 {
                     // deserialize event
                     var domainEvent = _serializer.Deserialize(e.Event.Data, eventType);
-                
-                    // try to execute the projection
-                    await projection.Handle(domainEvent);
 
-                    // log
-                    Log.Debug("{projection} handled {event}", projection, domainEvent);
+                    // try to execute the projection
+                    if (projection.CanHandle(domainEvent))
+                    {
+                        try
+                        {
+                            await projection
+                                .Handle(domainEvent)
+                                .ConfigureAwait(false);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Fatal("{projection} failed to handle {event}: {message}", ex, projection, domainEvent);
+                            throw;
+                        }
+
+                        Log.Debug("{projection} handled {event}", projection, domainEvent);
+                    }
                 }
 
                 // store the current checkpoint
-                await _checkpointStore.SetCheckpoint(e.OriginalPosition.Value, projection);
+                await _checkpointStore
+                    .SetCheckpoint(e.OriginalPosition.Value, projection)
+                    .ConfigureAwait(false);
             };
 
-        private Action<EventStoreCatchUpSubscription, SubscriptionDropReason, Exception>SubscriptionDropped(Projection projection) 
+        Action<EventStoreCatchUpSubscription, SubscriptionDropReason, Exception>SubscriptionDropped(Projection projection)
             => (subscription, reason, ex) =>
             {
                 // TODO: Reevaluate stopping subscriptions when issues with reconnect get fixed.
@@ -119,7 +135,7 @@ namespace Marketplace.Infrastructure.EventStore
                 }
             };
 
-        private static Action<EventStoreCatchUpSubscription> LiveProcessingStarted(Projection projection) 
+        static Action<EventStoreCatchUpSubscription> LiveProcessingStarted(Projection projection)
             => _ => Log.Debug("{projection} projection has caught up, now processing live!", projection);
     }
 }

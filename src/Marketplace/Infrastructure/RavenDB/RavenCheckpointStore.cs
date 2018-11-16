@@ -7,9 +7,9 @@ namespace Marketplace.Infrastructure.RavenDB
 {
     public class RavenCheckpointStore : ICheckpointStore
     {
-        private static readonly Serilog.ILogger Log = Serilog.Log.ForContext<RavenCheckpointStore>();
+        static readonly Serilog.ILogger Log = Serilog.Log.ForContext<RavenCheckpointStore>();
 
-        private readonly Func<IAsyncDocumentSession> _getSession;
+        readonly Func<IAsyncDocumentSession> _getSession;
 
         public RavenCheckpointStore(Func<IAsyncDocumentSession> getSession) => _getSession = getSession;
 
@@ -19,7 +19,8 @@ namespace Marketplace.Infrastructure.RavenDB
 
             using (var session = _getSession())
             {
-                var doc = await session.LoadAsync<CheckpointDocument>(GetCheckpointDocumentId(projection));
+                var doc = await session.LoadAsync<CheckpointDocument>(GetCheckpointDocumentId(projection))
+                    .ConfigureAwait(false);
 
                 if (doc != null)
                 {
@@ -40,23 +41,23 @@ namespace Marketplace.Infrastructure.RavenDB
             using (var session = _getSession())
             {
                 var id = GetCheckpointDocumentId(projection);
-                var doc = await session.LoadAsync<CheckpointDocument>(id);
+                var doc = await session.LoadAsync<CheckpointDocument>(id).ConfigureAwait(false);
 
                 if (doc != null)
                     doc.Checkpoint = checkpoint;
                 else
-                    await session.StoreAsync(new CheckpointDocument { Checkpoint = checkpoint }, id);
+                    await session.StoreAsync(new CheckpointDocument { Checkpoint = checkpoint }, id).ConfigureAwait(false);
 
-                await session.SaveChangesAsync();
+                await session.SaveChangesAsync().ConfigureAwait(false);
 
                 Log.Debug("{projection} checkpoint set to {checkpoint}", projection, checkpoint);
             }
         }
 
-        private static string GetCheckpointDocumentId(string projection) => 
+        static string GetCheckpointDocumentId(string projection) =>
             $"checkpoints/{projection.ToLowerInvariant()}";
 
-        private class CheckpointDocument
+        class CheckpointDocument
         {
             public object Checkpoint { get; set; }
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using Marketplace.Framework;
+﻿using Marketplace.Framework;
 
 namespace Marketplace.Domain.ClassifiedAds
 {
@@ -13,8 +12,8 @@ namespace Marketplace.Domain.ClassifiedAds
 
         public static Price Parse(double value)
         {
-            if (value <= 0)
-                throw new ArgumentOutOfRangeException(nameof(value), "Price cannot be negative.");
+            if (value < 0)
+                throw new PriceNotAllowed();
 
             return new Price(value);
         }

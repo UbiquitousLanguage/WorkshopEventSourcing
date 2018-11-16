@@ -6,22 +6,22 @@ using Xunit.Abstractions;
 
 namespace Marketplace.Tests
 {
-    public abstract class Specification<TAggregate, TCommand> 
-          where TAggregate  : Aggregate, new() 
+    public abstract class Specification<TAggregate, TCommand>
+          where TAggregate  : Aggregate, new()
     {
-        private readonly ITestOutputHelper _output;
+        readonly ITestOutputHelper _output;
 
-        public Specification(ITestOutputHelper output)
+        protected Specification(ITestOutputHelper output)
         {
             _output = output;
-            
-            History = Given();           
+
+            History = Given();
             Command = When();
 
             var sut = new TAggregate();
-                      
-            sut.Load(History);
-            
+
+            sut.Load(History.Length, History);
+
             var store = SpecificationAggregateStore.For(sut);
 
             try
@@ -34,14 +34,14 @@ namespace Marketplace.Tests
             }
 
             RaisedEvents = store.RaisedEvents;
-            
+
             Print();
         }
 
-        public object[] History { get; private set; } 
-        
+        public object[] History { get; private set; }
+
         public TCommand Command { get; }
-  
+
         public object[] RaisedEvents { get; }
 
         public Exception CaughtException { get; }
@@ -56,9 +56,9 @@ namespace Marketplace.Tests
         {
             public static SpecificationAggregateStore For(Aggregate aggregate) => new SpecificationAggregateStore(aggregate);
 
-            private Aggregate _aggregate;
+            Aggregate _aggregate;
 
-            private SpecificationAggregateStore(Aggregate aggregate) => _aggregate = aggregate;
+            SpecificationAggregateStore(Aggregate aggregate) => _aggregate = aggregate;
 
             public object[] RaisedEvents { get; private set; }
 
@@ -81,7 +81,7 @@ namespace Marketplace.Tests
                 => Task.FromResult(_aggregate.Version + _aggregate.GetChanges().Length);
         }
 
-        private void Print()
+        void Print()
         {
             _output.WriteLine("Scenario: " + GetType().Name.Replace("_"," "));
             _output.WriteLine("");
@@ -91,13 +91,13 @@ namespace Marketplace.Tests
                 _output.WriteLine("Given");
                 foreach (var entry in History)
                 {
-                    _output.WriteLine($"    {entry}"); 
-                } 
+                    _output.WriteLine($"    {entry}");
+                }
             }
-            
+
             _output.WriteLine("When");
             _output.WriteLine($"    {Command}");
-          
+
             _output.WriteLine("Then");
             foreach (var e in RaisedEvents)
             {

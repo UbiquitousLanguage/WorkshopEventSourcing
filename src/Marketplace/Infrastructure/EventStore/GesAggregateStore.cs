@@ -12,15 +12,15 @@ namespace Marketplace.Infrastructure.EventStore
 {
     public class GesAggregateStore : IAggregateStore
     {
-        private const int MaxReadSize = 4096;
+        const int MaxReadSize = 4096;
 
-        private static readonly Serilog.ILogger Log = Serilog.Log.ForContext<GesAggregateStore>();
-        
-        private readonly IEventStoreConnection _connection;
-        private readonly GetStreamName _getStreamName;
-        private readonly ISerializer _serializer;
-        private readonly TypeMapper _typeMapper;
-        private readonly UserCredentials _userCredentials;
+        static readonly Serilog.ILogger Log = Serilog.Log.ForContext<GesAggregateStore>();
+
+        readonly IEventStoreConnection _connection;
+        readonly GetStreamName _getStreamName;
+        readonly ISerializer _serializer;
+        readonly TypeMapper _typeMapper;
+        readonly UserCredentials _userCredentials;
 
         public GesAggregateStore(
             GetStreamName getStreamName,
@@ -54,12 +54,14 @@ namespace Marketplace.Infrastructure.EventStore
                 var page = await _connection.ReadStreamEventsForwardAsync(
                     stream, nextPageStart, MaxReadSize, false, _userCredentials);
 
-                aggregate.Load(page.Events.Select(resolvedEvent =>
+                if (page.Events.Length > 0)
                 {
-                    var dataType = _typeMapper.GetType(resolvedEvent.Event.EventType);
-                    var data = _serializer.Deserialize(resolvedEvent.Event.Data, dataType);
-                    return data;
-                }).ToArray());
+                    aggregate.Load(
+                        page.Events.Last().Event.EventNumber,
+                        page.Events.Select(re => _serializer.Deserialize(
+                            re.Event.Data, _typeMapper.GetType(re.Event.EventType)
+                        )).ToArray());
+                }
 
                 nextPageStart = !page.IsEndOfStream ? page.NextEventNumber : -1;
             } while (nextPageStart != -1);

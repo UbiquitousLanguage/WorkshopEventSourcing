@@ -20,8 +20,8 @@ namespace Marketplace.Contracts
             {
                 public Guid ClassifiedAdId { get; set; }
                 public string Title { get; set; }
-                
-                public override string ToString() 
+
+                public override string ToString()
                     => $"Changing title of Classified Ad '{ClassifiedAdId}'...";
             }
 
@@ -29,8 +29,8 @@ namespace Marketplace.Contracts
             {
                 public Guid ClassifiedAdId { get; set; }
                 public string Text { get; set; }
-                
-                public override string ToString() 
+
+                public override string ToString()
                     => $"Changing text of Classified Ad '{ClassifiedAdId}'...";
             }
 
@@ -38,32 +38,32 @@ namespace Marketplace.Contracts
             {
                 public Guid ClassifiedAdId { get; set; }
                 public double Price { get; set; }
-                
-                public override string ToString() 
+
+                public override string ToString()
                     => $"Changing price of Classified Ad '{ClassifiedAdId}'...";
             }
 
             public class Publish
             {
                 public Guid ClassifiedAdId { get; set; }
-                
-                public override string ToString() 
+
+                public override string ToString()
                     => $"Publishing Classified Ad '{ClassifiedAdId}'...";
             }
 
             public class MarkAsSold
             {
                 public Guid ClassifiedAdId { get; set; }
-                
-                public override string ToString() 
+
+                public override string ToString()
                     => $"Marking as sold Classified Ad '{ClassifiedAdId}'...";
             }
 
             public class Remove
             {
                 public Guid ClassifiedAdId { get; set; }
-                
-                public override string ToString() 
+
+                public override string ToString()
                     => $"Removing Classified Ad '{ClassifiedAdId}'...";
             }
 
@@ -81,12 +81,38 @@ namespace Marketplace.Contracts
                         public string Text { get; set; }
                         public double Price { get; set; }
                         public DateTimeOffset PublishedAt { get; set; }
+                        public Guid Owner { get; set; }
+                    }
+                }
+            }
+
+            public class GetAdsByOwner
+            {
+                public Guid OwnerId { get; set; }
+
+                public Shared.V1.ClassifiedAdStatus? Status { get; set; }
+
+                public class Result
+                {
+                    public Item[] Items { get; set; } = new Item[0];
+
+                    public class Item
+                    {
+                        public Guid ClassifiedAdId { get; set; }
+                        public string Title { get; set; }
+                        public string Text { get; set; }
+                        public double Price { get; set; }
+                        public DateTimeOffset RegisteredAt { get; set; }
+                        public DateTimeOffset? PublishedAt { get; set; }
+                        public DateTimeOffset? SoldAt { get; set; }
+                        public DateTimeOffset? RemovedAt { get; set; }
+                        public Shared.V1.ClassifiedAdStatus Status { get; set; }
                     }
                 }
             }
         }
     }
-    
+
     public static class Shared
     {
         public static class V1
@@ -109,12 +135,8 @@ namespace Marketplace.Contracts
                 public int TotalItems { get; set; }
                 public T[] Items { get; set; }
             }
-            
-            public class Picture
-            {
-                public string Url { get; set; }
-                public string Description { get; set; }
-            }
+
+            public enum ClassifiedAdStatus { Registered, Published, Removed, Sold }
         }
     }
 }

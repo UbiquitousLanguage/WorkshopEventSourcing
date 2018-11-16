@@ -11,66 +11,85 @@ namespace Marketplace.Modules.ClassifiedAds.Projections
 {
     public class ClassifiedAdsByOwnerProjection : Projection
     {
-        private Func<IAsyncDocumentSession> GetSession { get; }
+        Func<IAsyncDocumentSession> GetSession { get; }
 
         public ClassifiedAdsByOwnerProjection(Func<IAsyncDocumentSession> getSession) => GetSession = getSession;
 
         public override Task Handle(object e)
         {
-                switch (e)
-                {
-                    case V1.ClassifiedAdRegistered x:
-                        return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
+            switch (e)
+            {
+                case V1.ClassifiedAdRegistered x:
+                    return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
+                    {
+                        doc.Ads.Add(new ClassifiedAd
                         {
-                            doc.OwnerId = x.Owner;
-                            doc.Ads.Add(new ClassifiedAd
-                            {
-                                Id = x.ClassifiedAdId,
-                                Title = x.Title,
-                                Status = ClassifiedAdStatus.Registered
-                            });
+                            Id = x.ClassifiedAdId,
+                            RegisteredAt = x.RegisteredAt,
+                            Status = ClassifiedAdStatus.Registered
                         });
+                    });
 
-                    case V1.ClassifiedAdPriceChanged x:
-                        return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
-                        {
-                            doc.Ads.Single(a => a.Id == x.ClassifiedAdId).Price = x.Price;
-                        });
+                case V1.ClassifiedAdTitleChanged x:
+                    return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
+                    {
+                        doc.Ads.Single(a => a.Id == x.ClassifiedAdId).Title = x.Title;
+                    }, true);
 
-                    case V1.ClassifiedAdTitleChanged x:
-                        return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
-                        {
-                            doc.Ads.Single(a => a.Id == x.ClassifiedAdId).Title = x.Title;
-                        });
+                case V1.ClassifiedAdTextChanged x:
+                    return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
+                    {
+                        doc.Ads.Single(a => a.Id == x.ClassifiedAdId).Text = x.Text;
+                    }, true);
 
-                    case V1.ClassifiedAdPublished x:
-                        return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
-                        {
-                            doc.Ads.Single(a => a.Id == x.ClassifiedAdId).Status = ClassifiedAdStatus.Published;
-                        });
+                case V1.ClassifiedAdPriceChanged x:
+                    return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
+                    {
+                        doc.Ads.Single(a => a.Id == x.ClassifiedAdId).Price = x.Price;
+                    }, true);
 
-                    case V1.ClassifiedAdSold x:
-                        return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
-                        {
-                            doc.Ads.Single(a => a.Id == x.ClassifiedAdId).Status = ClassifiedAdStatus.Sold;
-                        });
+                case V1.ClassifiedAdPublished x:
+                    return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
+                    {
+                        var ad = doc.Ads.Single(a => a.Id == x.ClassifiedAdId);
+                        ad.PublishedAt = x.PublishedAt;
+                        ad.Status = ClassifiedAdStatus.Published;
+                    }, true);
 
-                    case V1.ClassifiedAdRemoved x:
-                        return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
-                        {
-                            doc.Ads.Single(a => a.Id == x.ClassifiedAdId).Status = ClassifiedAdStatus.Removed;
-                        });
+                case V1.ClassifiedAdSold x:
+                    return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
+                    {
+                        var ad = doc.Ads.Single(a => a.Id == x.ClassifiedAdId);
+                        ad.SoldAt = x.SoldAt;
+                        ad.Status = ClassifiedAdStatus.Sold;
+                    });
 
-                    default:
-                        return Task.CompletedTask;
-                }
+                case V1.ClassifiedAdRemoved x:
+                    return GetSession.ThenSave<ClassifiedAdsByOwner>(ClassifiedAdsByOwner.Id(x.Owner), doc =>
+                    {
+                        var ad = doc.Ads.Single(a => a.Id == x.ClassifiedAdId);
+                        ad.RemovedAt = x.RemovedAt;
+                        ad.Status = ClassifiedAdStatus.Removed;
+                    });
+
+                default:
+                    return Task.CompletedTask;
+            }
         }
+
+        public override bool CanHandle(object e)
+            => e is V1.ClassifiedAdRegistered
+            || e is V1.ClassifiedAdTitleChanged
+            || e is V1.ClassifiedAdTextChanged
+            || e is V1.ClassifiedAdPriceChanged
+            || e is V1.ClassifiedAdPublished
+            || e is V1.ClassifiedAdSold
+            || e is V1.ClassifiedAdRemoved;
 
         public class ClassifiedAdsByOwner
         {
             public static string Id(Guid id) => $"ClassifiedAdsByOwner/{id}";
 
-            public Guid OwnerId { get; set; }
             public List<ClassifiedAd> Ads { get; set; } = new List<ClassifiedAd>();
         }
 
@@ -78,8 +97,14 @@ namespace Marketplace.Modules.ClassifiedAds.Projections
         {
             public Guid Id { get; set; }
             public string Title { get; set; }
+            public string Text { get; set; }
             public double Price { get; set; }
+
             public ClassifiedAdStatus Status { get; set; }
+            public DateTimeOffset? SoldAt { get; set; }
+            public DateTimeOffset RegisteredAt { get; set; }
+            public DateTimeOffset? PublishedAt { get; set; }
+            public DateTimeOffset? RemovedAt { get; set; }
         }
 
         public enum ClassifiedAdStatus { Registered, Published, Removed, Sold }

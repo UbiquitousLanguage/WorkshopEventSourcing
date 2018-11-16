@@ -5,11 +5,13 @@ namespace Marketplace.Framework
 {
     public abstract class Projection
     {
-        private readonly Type _type;
+        readonly Type _type;
 
         protected Projection() => _type = GetType();
 
         public abstract Task Handle(object e);
+
+        public abstract bool CanHandle(object e);
 
         public override string ToString() => _type.Name;
 

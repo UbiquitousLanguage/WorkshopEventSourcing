@@ -1,32 +1,64 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Raven.Client.Documents.Session;
 using Serilog;
 using static Marketplace.Contracts.ClassifiedAds;
 
 namespace Marketplace.Modules.ClassifiedAds
 {
-    [Route("/ad")]
+    [Route("/ads")]
     public class ClassifiedAdsQueriesApi : Controller
     {
-        private static readonly ILogger Log = Serilog.Log.ForContext<ClassifiedAdsQueriesApi>();
+        static readonly ILogger Log = Serilog.Log.ForContext<ClassifiedAdsQueriesApi>();
 
-        private Func<IAsyncDocumentSession> GetSession { get; }
+        ClassifiedAdsQueryService Service { get; }
 
-        public ClassifiedAdsQueriesApi(Func<IAsyncDocumentSession> getSession) => GetSession = getSession;
+        public ClassifiedAdsQueriesApi(ClassifiedAdsQueryService service) => Service = service;
 
-        [HttpGet] public Task<IActionResult> When([FromQuery] V1.GetAvailableAds qry) => RunQuery(qry, session => session.GetAvailableAds(qry));
+        [HttpGet, Route("available")]
+        public Task<IActionResult> When([FromQuery] V1.GetAvailableAds qry)
+            => RunQuery(qry, () => Service.GetAvailableAds(qry, HttpContext.RequestAborted));
 
-        private async Task<IActionResult> RunQuery<T, TResult>(T query, Func<IAsyncDocumentSession, Task<TResult>> runQuery)
-            where T : class where TResult : class
+        [HttpGet, Route("by-owner")]
+        public Task<IActionResult> When([FromQuery] V1.GetAdsByOwner qry)
+            => RunQuery(qry, () => Service.GetAdsByOwner(qry, HttpContext.RequestAborted));
+
+        async Task<IActionResult> RunQuery<T, TResult>(T query, Func<Task<TResult>> runQuery)
         {
             Log.Information(query.ToString());
-            using (var session = GetSession())
-            {
-                var result = await runQuery(session);
-                return Ok(result);
-            }
+            var result = await runQuery();
+            return Ok(result);
         }
     }
+
+//    [Route("/ads")]
+//    public class ClassifiedAdsQueriesApi : Controller
+//    {
+//        static readonly ILogger Log = Serilog.Log.ForContext<ClassifiedAdsQueriesApi>();
+//
+//        Func<IAsyncDocumentSession> GetSession { get; }
+//
+//        public ClassifiedAdsQueriesApi(Func<IAsyncDocumentSession> getSession) => GetSession = getSession;
+//
+//        [HttpGet, Route("available")]
+//        public Task<IActionResult> When([FromQuery] V1.GetAvailableAds qry)
+//            => RunQuery(qry, session => session.GetAvailableAds(qry, HttpContext.RequestAborted));
+//
+//        [HttpGet, Route("available")]
+//        public Task<IActionResult> When([FromQuery] V1.GetAdsByOwner qry)
+//            => RunQuery(qry, session => session.GetAdsByOwner(qry));
+//
+//        async Task<IActionResult> RunQuery<T, TResult>(T query, Func<IAsyncDocumentSession, Task<TResult>> runQuery)
+//            where T : class where TResult : class
+//        {
+//            Log.Information(query.ToString());
+//            using (var session = GetSession())
+//            {
+//                var result = await runQuery(session);
+//                return Ok(result);
+//            }
+//        }
+//    }
 }

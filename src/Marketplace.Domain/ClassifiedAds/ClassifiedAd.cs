@@ -1,27 +1,25 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Marketplace.Domain.Shared.Services;
 using Marketplace.Framework;
 
 namespace Marketplace.Domain.ClassifiedAds
 {
     public class ClassifiedAd : Aggregate
     {
-        private bool IsPublished { get; set; }
-        private bool WasSold { get; set; }
-        private bool WasRemoved { get; set; }
-        private Title Title { get; set; }
-        private AdText Text { get; set; }
-        private Price Price { get; set; }
-        private Guid Owner { get; set; }
-        
+        bool IsPublished { get; set; }
+        bool WasSold { get; set; }
+        bool WasRemoved { get; set; }
+
+        Title Title { get; set; } = Title.Default;
+        AdText Text { get; set; } = AdText.Default;
+        Price Price { get; set; } = Price.Default;
+        OwnerId Owner { get; set; } = OwnerId.Default;
+
         protected override void When(object e)
         {
             switch (e)
             {
                 case Events.V1.ClassifiedAdRegistered x:
-                    Id = x.ClassifiedAdId;
-                    Title = new Title(x.Title);
+                    Id = new ClassifiedAdId(x.ClassifiedAdId);
                     Owner = new OwnerId(x.Owner);
                     break;
 
@@ -37,26 +35,31 @@ namespace Marketplace.Domain.ClassifiedAds
                     Price = new Price(x.Price);
                     break;
 
-                case Events.V1.ClassifiedAdPublished x:
+                case Events.V1.ClassifiedAdPublished _:
                     IsPublished = true;
                     break;
 
-                case Events.V1.ClassifiedAdSold x:
+                case Events.V1.ClassifiedAdSold _:
                     WasSold = true;
+                    break;
+
+                case Events.V1.ClassifiedAdRemoved _:
+                    WasRemoved = true;
                     break;
             }
         }
 
-        public static ClassifiedAd Register(ClassifiedAdId id, OwnerId owner, Func<DateTimeOffset> getUtcNow)
+        public void Register(ClassifiedAdId id, OwnerId owner, Func<DateTimeOffset> getUtcNow)
         {
-            var ad = new ClassifiedAd();
-            ad.Apply(new Events.V1.ClassifiedAdRegistered
+            if (Version >= 0)
+                throw new ClassifiedAdAlreadyRegistered();
+
+            Apply(new Events.V1.ClassifiedAdRegistered
             {
                 ClassifiedAdId = id,
                 Owner = owner,
                 RegisteredAt = getUtcNow()
             });
-            return ad;
         }
 
         public void ChangeTitle(Title title, Func<DateTimeOffset> getUtcNow)
@@ -64,8 +67,11 @@ namespace Marketplace.Domain.ClassifiedAds
             if (Version == -1)
                 throw new ClassifiedAdNotFound();
 
+            if (WasRemoved)
+                throw new ClassifiedAdRemoved();
+
             if (Title != Title.Default && Title == title) return;
-            
+
             Apply(new Events.V1.ClassifiedAdTitleChanged
             {
                 ClassifiedAdId = Id,
@@ -75,13 +81,16 @@ namespace Marketplace.Domain.ClassifiedAds
             });
         }
 
-        public void ChangeText(AdText text, Func<DateTimeOffset> getUtcNow, CheckTextForProfanity checkTextForProfanity)
+        public void ChangeText(AdText text, Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
                 throw new ClassifiedAdNotFound();
-            
-            if (Text != AdText.Default && Text == text) return;  
-            
+
+            if (WasRemoved)
+                throw new ClassifiedAdRemoved();
+
+            if (Text != AdText.Default && Text == text) return;
+
             Apply(new Events.V1.ClassifiedAdTextChanged
             {
                 ClassifiedAdId = Id,
@@ -94,10 +103,13 @@ namespace Marketplace.Domain.ClassifiedAds
         public void ChangePrice(Price price, Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
-                throw new ClassifiedAdNotFound();  
-            
+                throw new ClassifiedAdNotFound();
+
+            if (WasRemoved)
+                throw new ClassifiedAdRemoved();
+
             if (Price != Price.Default && Price == price) return;
-            
+
             Apply(new Events.V1.ClassifiedAdPriceChanged
             {
                 ClassifiedAdId = Id,
@@ -112,11 +124,18 @@ namespace Marketplace.Domain.ClassifiedAds
             if (Version == -1)
                 throw new ClassifiedAdNotFound();
 
+            if (WasRemoved)
+                throw new ClassifiedAdRemoved();
+
             if (IsPublished) return;
-            
+
+            if (Title == Title.Default)
+                throw new TitleRequired();
+
             Apply(new Events.V1.ClassifiedAdPublished
             {
                 ClassifiedAdId = Id,
+                Owner = Owner,
                 Title = Title,
                 Text = Text,
                 PublishedAt = getUtcNow()
@@ -126,12 +145,19 @@ namespace Marketplace.Domain.ClassifiedAds
         public void MarkAsSold(Func<DateTimeOffset> getUtcNow)
         {
             if (Version == -1)
-                throw new ClassifiedAdNotFound();     
-            
+                throw new ClassifiedAdNotFound();
+
+            if (WasRemoved)
+                throw new ClassifiedAdRemoved();
+
             if (WasSold) return;
-            
+
+            if (!IsPublished)
+                throw new ClassifiedAdUnpublished();
+
             Apply(new Events.V1.ClassifiedAdSold
             {
+                Owner = Owner,
                 ClassifiedAdId = Id,
                 SoldAt = getUtcNow()
             });
@@ -143,9 +169,10 @@ namespace Marketplace.Domain.ClassifiedAds
                 throw new ClassifiedAdNotFound();
 
             if (WasRemoved) return;
-            
+
             Apply(new Events.V1.ClassifiedAdRemoved
             {
+                Owner = Owner,
                 ClassifiedAdId = Id,
                 RemovedAt = getUtcNow()
             });

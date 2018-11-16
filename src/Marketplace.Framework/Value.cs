@@ -10,7 +10,7 @@ namespace Marketplace.Framework
     public abstract class Value<T> where T : Value<T>
     {
         [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
-        private static readonly Member[] Members = GetMembers().ToArray();
+        static readonly Member[] Members = GetMembers().ToArray();
 
         public override bool Equals(object other)
         {
@@ -62,7 +62,7 @@ namespace Marketplace.Framework
             return $"{typeof(T).Name}[{string.Join("|", values)}]";
         }
 
-        private static IEnumerable<Member> GetMembers()
+        static IEnumerable<Member> GetMembers()
         {
             var t = typeof(T);
             const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public;
@@ -75,13 +75,13 @@ namespace Marketplace.Framework
             }
         }
 
-        private static IEnumerable<object> GetEnumerableValues(object obj)
+        static IEnumerable<object> GetEnumerableValues(object obj)
         {
             var enumerator = ((IEnumerable) obj).GetEnumerator();
             while (enumerator.MoveNext()) yield return enumerator.Current;
         }
 
-        private static int CombineHashCodes(IEnumerable<object> objs)
+        static int CombineHashCodes(IEnumerable<object> objs)
         {
             unchecked
             {
@@ -89,7 +89,7 @@ namespace Marketplace.Framework
             }
         }
 
-        private struct Member
+        struct Member
         {
             public readonly string Name;
             public readonly Func<object, object> GetValue;
