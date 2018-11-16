@@ -64,7 +64,7 @@ namespace Marketplace.Infrastructure.EventStore
         }
 
         Action<EventStoreCatchUpSubscription, ResolvedEvent> EventAppeared(Projection projection)
-            => async (_, e) =>
+            => (_, e) =>
             {
                 // always double check if it is a system event ;)
                 if (e.OriginalEvent.EventType.StartsWith("$")) return;
@@ -82,13 +82,13 @@ namespace Marketplace.Infrastructure.EventStore
                     // try to execute the projection
                     if (projection.CanHandle(domainEvent))
                     {
-                        await projection.Handle(domainEvent);
+                        projection.Handle(domainEvent).GetAwaiter().GetResult();
                         Log.Debug("{projection} handled {event}", projection, domainEvent);
                     }
                 }
 
                 // store the current checkpoint
-                await _checkpointStore.SetCheckpoint(e.OriginalPosition, projection);
+                _checkpointStore.SetCheckpoint(e.OriginalPosition, projection).GetAwaiter().GetResult();
             };
 
         Action<EventStoreCatchUpSubscription, SubscriptionDropReason, Exception>SubscriptionDropped(Projection projection)

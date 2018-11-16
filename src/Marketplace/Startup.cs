@@ -89,7 +89,6 @@ namespace Marketplace
                 .TypeMapper(typeMapper)
                 .CheckpointStore(new RavenCheckpointStore(GetSession))
                 .Projections(
-                    //new ClassifiedAdsByOwnerProjection(GetSession),
                     new SoldClassifiedAdsProjection(GetSession),
                     new AvailableClassifiedAdsProjection(GetSession))
                 .Activate();

@@ -54,7 +54,7 @@ namespace Marketplace.Infrastructure.RavenDB
         }
 
         static string GetCheckpointDocumentId(string projection) =>
-            $"Checkpoints/{projection.ToLowerInvariant()}";
+            $"Checkpoints/{projection}";
 
         class CheckpointDocument
         {
